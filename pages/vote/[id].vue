@@ -9,11 +9,13 @@ const route = useRoute();
 const router = useRouter();
 const { getPoll, vote, subscribe } = usePolls();
 const { hasVoted: checkHasVoted, markVoted, getVotedOption } = useUserVotes();
+const { userName } = useUser();
 const pollId = route.params.id as string;
 
 const poll = ref<Poll | null>(null);
 const selectedOption = ref<string | null>(null);
 const hasVoted = ref(false);
+const expandedOptionId = ref<string | null>(null);
 
 const pollRef = await getPoll(pollId);
 if (pollRef.value) {
@@ -29,7 +31,7 @@ if (pollRef.value) {
 
 const handleVote = async () => {
   if (selectedOption.value) {
-    await vote(pollId, selectedOption.value);
+    await vote(pollId, selectedOption.value, userName.value);
     markVoted(pollId, selectedOption.value);
     hasVoted.value = true;
   }
@@ -102,17 +104,43 @@ const getPercentage = (votes: number) => {
         <div
           v-for="(option, index) in poll.options"
           :key="option.id"
-          class="relative w-full border-3 border-neo-black bg-neo-white p-4"
+          class="relative w-full border-3 border-neo-black bg-neo-white cursor-pointer transition-all hover:translate-x-1"
+          @click="expandedOptionId = expandedOptionId === option.id ? null : option.id"
           v-motion-slide-left
           :delay="index * 100"
         >
-          <div
-            class="absolute top-0 left-0 bottom-0 bg-neo-accent transition-all duration-1000 ease-out border-r-3 border-neo-black"
-            :style="{ width: `${getPercentage(option.votes)}%` }"
-          ></div>
-          <div class="relative z-10 flex justify-between font-bold text-xl">
-            <span>{{ option.text }}</span>
-            <span>{{ getPercentage(option.votes) }}% ({{ option.votes }})</span>
+          <div class="p-4 relative z-10">
+            <div
+              class="absolute top-0 left-0 bottom-0 bg-neo-accent transition-all duration-1000 ease-out border-r-3 border-neo-black"
+              :style="{ width: `${getPercentage(option.votes)}%` }"
+            ></div>
+            <div class="relative z-10 flex justify-between font-bold text-xl items-center">
+              <span>{{ option.text }}</span>
+              <div class="flex items-center gap-2">
+                <span>{{ getPercentage(option.votes) }}% ({{ option.votes }})</span>
+                <span
+                  class="text-sm transition-transform duration-200"
+                  :class="{ 'rotate-180': expandedOptionId === option.id }"
+                >
+                  ▼
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voter List -->
+          <div v-if="expandedOptionId === option.id" class="border-t-3 border-neo-black bg-white p-4 animate-fade-in">
+            <p class="font-bold mb-2 text-sm uppercase text-gray-500">Voters:</p>
+            <div v-if="option.voters && option.voters.length > 0" class="flex flex-wrap gap-2">
+              <span
+                v-for="voter in option.voters"
+                :key="voter"
+                class="px-2 py-1 bg-neo-bg border-2 border-neo-black text-sm font-bold shadow-neo-sm transform hover:-translate-y-1 transition-transform"
+              >
+                {{ voter }}
+              </span>
+            </div>
+            <p v-else class="text-gray-400 italic text-sm">No one yet...</p>
           </div>
         </div>
 

@@ -4,6 +4,7 @@ export interface PollOption {
   id: string;
   text: string;
   votes: number;
+  voters: string[];
 }
 
 export interface Poll {
@@ -31,12 +32,13 @@ export const usePollStorage = () => {
         id: Math.random().toString(36).substring(2, 9),
         text,
         votes: 0,
+        voters: [],
       })),
     };
     return polls[id];
   };
 
-  const vote = (pollId: string, optionId: string) => {
+  const vote = (pollId: string, optionId: string, voterName?: string) => {
     const poll = polls[pollId];
     if (!poll) return false;
 
@@ -44,6 +46,9 @@ export const usePollStorage = () => {
     if (!option) return false;
 
     option.votes++;
+    if (voterName) {
+      option.voters.push(voterName);
+    }
     broadcast(pollId);
     return true;
   };

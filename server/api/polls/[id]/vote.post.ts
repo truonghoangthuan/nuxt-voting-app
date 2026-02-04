@@ -1,10 +1,10 @@
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
   const body = await readBody(event);
-  const { optionId } = body;
+  const { optionId, voterName } = body;
 
   const storage = usePollStorage();
-  const success = storage.vote(id!, optionId);
+  const success = storage.vote(id!, optionId, voterName);
 
   if (!success) {
     throw createError({

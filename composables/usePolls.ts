@@ -14,10 +14,10 @@ export const usePolls = () => {
     return data;
   };
 
-  const vote = async (pollId: string, optionId: string) => {
+  const vote = async (pollId: string, optionId: string, voterName?: string | null) => {
     await useFetch(`/api/polls/${pollId}/vote`, {
       method: 'POST',
-      body: { optionId },
+      body: { optionId, voterName },
     });
   };
 
