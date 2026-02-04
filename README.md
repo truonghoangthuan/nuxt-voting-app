@@ -9,6 +9,10 @@ A real-time voting application built with **Nuxt 3**, featuring a **Neo-Brutalis
 - 🎨 **Neo-Brutalism Design**: Styled with a bold, high-contrast aesthetic using TailwindCSS.
 - 📱 **Responsive**: Fully responsive interface that works on mobile and desktop.
 - 🔄 **Animations**: Smooth transitions and animations using `@vueuse/motion`.
+- 👤 **User Identification**: Seamlessly identify users with a persistent name entry dialog.
+- 👁️ **Voter Transparency**: Click on any option to see exactly who voted for it.
+- 🚫 **Duplicate Prevention**: Local storage persistence ensures users can only vote once per poll.
+- 🔗 **Easy Sharing**: One-click copy-to-clipboard button to share polls instantly.
 
 ## Tech Stack
 
@@ -64,14 +68,20 @@ npm run preview
 
 ## Project Structure
 
-- `components/ui/`: Reusable UI components (NeoButton, NeoCard, NeoInput, etc.)
+- `components/`:
+  - `ui/`: Reusable UI components (NeoButton, NeoCard, NeoInput, etc.)
+  - `UserNameDialog.vue`: Global user identification modal
+  - `WelcomeBanner.vue`: Persistent welcome display
 - `pages/`: Application views and routing
   - `index.vue`: Create poll page
   - `vote/[id].vue`: Voting page (dynamic route)
 - `server/`: Backend logic
   - `api/`: API endpoints for voting and polling
   - `utils/`: Server-side utilities (storage, etc.)
-- `composables/`: Shared state logic (e.g., `usePolls`)
+- `composables/`: Shared state logic
+  - `usePolls.ts`: Polling logic
+  - `useUser.ts`: User name management
+  - `useUserVotes.ts`: Local voting state persistence
 
 ## License
 
