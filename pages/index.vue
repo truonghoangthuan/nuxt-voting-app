@@ -14,11 +14,13 @@ const removeOption = (index: number) => {
   }
 };
 
-const handleCreate = () => {
+const handleCreate = async () => {
   const validOptions = options.value.filter((o) => o.trim());
   if (question.value.trim() && validOptions.length >= 2) {
-    const id = createPoll(question.value, validOptions);
-    router.push(`/vote/${id}`);
+    const id = await createPoll(question.value, validOptions);
+    if (id) {
+      router.push(`/vote/${id}`);
+    }
   } else {
     alert('Please enter a question and at least 2 options!');
   }
@@ -41,7 +43,11 @@ const handleCreate = () => {
             :delay="index * 100"
           >
             <div class="flex-grow">
-              <NeoInput v-model="options[index]" :placeholder="`Option ${index + 1}`" />
+              <NeoInput
+                :model-value="options[index] as string"
+                @update:model-value="options[index] = $event"
+                :placeholder="`Option ${index + 1}`"
+              />
             </div>
             <NeoButton v-if="options.length > 2" variant="danger" @click="removeOption(index)" class="mb-0 mr-0">
               X

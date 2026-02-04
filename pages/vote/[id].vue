@@ -1,23 +1,44 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 import { usePolls } from '../../composables/usePolls';
-import { computed, ref } from 'vue';
+import type { Poll } from '~/server/utils/storage';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
-const { getPoll, vote } = usePolls();
+const { getPoll, vote, subscribe } = usePolls();
 const pollId = route.params.id as string;
 
-const poll = computed(() => getPoll(pollId));
+const poll = ref<Poll | null>(null);
 const selectedOption = ref<string | null>(null);
 const hasVoted = ref(false);
 
-const handleVote = () => {
+const pollRef = await getPoll(pollId);
+if (pollRef.value) {
+  poll.value = pollRef.value;
+}
+
+const handleVote = async () => {
   if (selectedOption.value) {
-    vote(pollId, selectedOption.value);
+    await vote(pollId, selectedOption.value);
     hasVoted.value = true;
   }
 };
+
+let unsubscribe: (() => void) | undefined;
+
+onMounted(() => {
+  // Subscribe to real-time updates
+  unsubscribe = subscribe(pollId, (updatedPoll) => {
+    poll.value = updatedPoll;
+  });
+});
+
+onUnmounted(() => {
+  if (unsubscribe) {
+    unsubscribe();
+  }
+});
 
 const totalVotes = computed(() => {
   if (!poll.value) return 0;

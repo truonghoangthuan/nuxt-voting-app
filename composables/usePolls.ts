@@ -1,50 +1,45 @@
-export interface PollOption {
-  id: string;
-  text: string;
-  votes: number;
-}
-
-export interface Poll {
-  id: string;
-  question: string;
-  options: PollOption[];
-}
+import type { Poll } from '~/server/utils/storage';
 
 export const usePolls = () => {
-  const polls = useState<Poll[]>('polls', () => []);
+  const createPoll = async (question: string, options: string[]) => {
+    const { data } = await useFetch<Poll>('/api/polls', {
+      method: 'POST',
+      body: { question, options },
+    });
+    return data.value?.id;
+  };
 
-  const createPoll = (question: string, options: string[]) => {
-    const newPoll: Poll = {
-      id: Math.random().toString(36).substring(2, 9),
-      question,
-      options: options.map((opt) => ({
-        id: Math.random().toString(36).substring(2, 9),
-        text: opt,
-        votes: 0,
-      })),
+  const getPoll = async (id: string) => {
+    const { data } = await useFetch<Poll>(`/api/polls/${id}`);
+    return data;
+  };
+
+  const vote = async (pollId: string, optionId: string) => {
+    await useFetch(`/api/polls/${pollId}/vote`, {
+      method: 'POST',
+      body: { optionId },
+    });
+  };
+
+  const subscribe = (pollId: string, onUpdate: (poll: Poll) => void) => {
+    if (import.meta.server) return;
+
+    const eventSource = new EventSource(`/api/polls/${pollId}/sse`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      onUpdate(data);
     };
-    polls.value.push(newPoll);
-    return newPoll.id;
-  };
 
-  const getPoll = (id: string) => {
-    return polls.value.find((p: Poll) => p.id === id);
-  };
-
-  const vote = (pollId: string, optionId: string) => {
-    const poll = polls.value.find((p: Poll) => p.id === pollId);
-    if (poll) {
-      const option = poll.options.find((o: PollOption) => o.id === optionId);
-      if (option) {
-        option.votes++;
-      }
-    }
+    return () => {
+      eventSource.close();
+    };
   };
 
   return {
-    polls,
     createPoll,
     getPoll,
     vote,
+    subscribe,
   };
 };
