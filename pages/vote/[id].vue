@@ -3,10 +3,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { usePolls } from '../../composables/usePolls';
 import type { Poll } from '~/server/utils/storage';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { useUserVotes } from '~/composables/useUserVotes';
 
 const route = useRoute();
 const router = useRouter();
 const { getPoll, vote, subscribe } = usePolls();
+const { hasVoted: checkHasVoted, markVoted, getVotedOption } = useUserVotes();
 const pollId = route.params.id as string;
 
 const poll = ref<Poll | null>(null);
@@ -16,11 +18,19 @@ const hasVoted = ref(false);
 const pollRef = await getPoll(pollId);
 if (pollRef.value) {
   poll.value = pollRef.value;
+
+  // Check if user has already voted
+  const votedOptionId = getVotedOption(pollId);
+  if (votedOptionId) {
+    selectedOption.value = votedOptionId;
+    hasVoted.value = true;
+  }
 }
 
 const handleVote = async () => {
   if (selectedOption.value) {
     await vote(pollId, selectedOption.value);
+    markVoted(pollId, selectedOption.value);
     hasVoted.value = true;
   }
 };
