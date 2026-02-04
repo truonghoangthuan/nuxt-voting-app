@@ -1,75 +1,78 @@
-# Nuxt Minimal Starter
+# Nuxt Voting App
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A real-time voting application built with **Nuxt 3**, featuring a **Neo-Brutalism** design aesthetic and live updates using Server-Sent Events (SSE).
 
-## Setup
+## Features
 
-Make sure to install dependencies:
+- 🗳️ **Create Polls**: Easily create polls with a question and multiple options.
+- ⚡ **Real-time Updates**: Watch vote counts update instantly across all connected clients without refreshing.
+- 🎨 **Neo-Brutalism Design**: Styled with a bold, high-contrast aesthetic using TailwindCSS.
+- 📱 **Responsive**: Fully responsive interface that works on mobile and desktop.
+- 🔄 **Animations**: Smooth transitions and animations using `@vueuse/motion`.
+
+## Tech Stack
+
+- **Framework**: [Nuxt 3](https://nuxt.com)
+- **UI Engine**: [Vue 3](https://vuejs.org)
+- **Styling**: [TailwindCSS](https://tailwindcss.com) + `tailwind-merge` + `clsx`
+- **Animations**: [VueUse Motion](https://motion.vueuse.org/)
+- **Server**: Nuxt Server Routes (Nitro)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or later recommended)
+- npm, pnpm, yarn, or bun
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <your-repo-url>
+   cd nuxt-voting-app
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Start the development server:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Visit `http://localhost:3000` to see the app in action.
+
+### Build for Production
 
 Build the application for production:
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview the production build locally:
 
 ```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Project Structure
+
+- `components/ui/`: Reusable UI components (NeoButton, NeoCard, NeoInput, etc.)
+- `pages/`: Application views and routing
+  - `index.vue`: Create poll page
+  - `vote/[id].vue`: Voting page (dynamic route)
+- `server/`: Backend logic
+  - `api/`: API endpoints for voting and polling
+  - `utils/`: Server-side utilities (storage, etc.)
+- `composables/`: Shared state logic (e.g., `usePolls`)
+
+## License
+
+[MIT](LICENSE)
