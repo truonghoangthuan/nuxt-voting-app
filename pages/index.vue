@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const question = ref('');
 const options = ref(['', '']);
+const showHelp = ref(false);
 const { createPoll } = usePolls();
 const router = useRouter();
 
@@ -99,6 +100,13 @@ const handleCreate = async () => {
               </div>
             </NeoButton>
             <NeoFileUpload @upload="handleFileUpload" />
+            <button
+              class="flex items-center justify-center w-12 h-12 rounded-full border-3 border-neo-black bg-neo-accent text-neo-black hover:bg-sky-400 font-bold shadow-neo active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              @click="showHelp = true"
+              title="Upload Help"
+            >
+              ?
+            </button>
           </div>
         </div>
 
@@ -107,5 +115,14 @@ const handleCreate = async () => {
         <NeoButton block variant="primary" @click="handleCreate" class="text-xl py-4"> CREATE POLL </NeoButton>
       </div>
     </NeoCard>
+
+    <NeoDialog v-model="showHelp" title="Upload Options Format">
+      <div class="space-y-4">
+        <p>You can upload a text file (.txt or .csv) to automatically populate the poll options.</p>
+        <p class="font-bold">Supported format:</p>
+        <code class="block bg-gray-100 p-3 border-2 border-neo-black rounded-lg"> Option 1, Option 2, Option 3 </code>
+        <p>Values should be separated by commas.</p>
+      </div>
+    </NeoDialog>
   </div>
 </template>
