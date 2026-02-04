@@ -101,7 +101,7 @@ const handleCreate = async () => {
             </NeoButton>
             <NeoFileUpload @upload="handleFileUpload" />
             <button
-              class="flex items-center justify-center w-12 h-12 rounded-full border-3 border-neo-black bg-neo-accent text-neo-black hover:bg-sky-400 font-bold shadow-neo active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              class="flex items-center justify-center w-12 h-12 rounded-full border-3 border-neo-black bg-sky-200 text-neo-black hover:bg-sky-400 font-bold shadow-neo active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
               @click="showHelp = true"
               title="Upload Help"
             >
