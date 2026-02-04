@@ -14,6 +14,30 @@ const removeOption = (index: number) => {
   }
 };
 
+const handleFileUpload = (content: string) => {
+  const newOptions = content
+    .split(',')
+    .map((o) => o.trim())
+    .filter((o) => o);
+  if (newOptions.length > 0) {
+    // Determine if we should append or replace.
+    // Logic: If there are only empty options (initial state), replace them.
+    // Otherwise, append.
+    const hasExistingContent = options.value.some((o) => o.trim() !== '');
+
+    if (!hasExistingContent) {
+      options.value = newOptions;
+    } else {
+      options.value.push(...newOptions);
+    }
+
+    // Ensure we have at least 2 empty options if the result is too short (though unlikely with file upload)
+    while (options.value.length < 2) {
+      options.value.push('');
+    }
+  }
+};
+
 const handleCreate = async () => {
   const validOptions = options.value.filter((o) => o.trim());
   if (question.value.trim() && validOptions.length >= 2) {
@@ -54,7 +78,28 @@ const handleCreate = async () => {
             </NeoButton>
           </div>
 
-          <NeoButton variant="secondary" @click="addOption" class="self-start"> + Add Option </NeoButton>
+          <div class="flex gap-4">
+            <NeoButton variant="secondary" @click="addOption" class="self-start">
+              <div class="flex items-center gap-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add Option</span>
+              </div>
+            </NeoButton>
+            <NeoFileUpload @upload="handleFileUpload" />
+          </div>
         </div>
 
         <div class="border-t-3 border-neo-black my-2"></div>
