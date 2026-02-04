@@ -72,7 +72,7 @@ const getPercentage = (votes: number) => {
       </NeoCard>
     </div>
 
-    <NeoCard v-else :title="hasVoted ? 'Results' : 'Vote Now'" v-motion-slide-bottom>
+    <NeoCard v-else :title="hasVoted ? 'Results' : 'Vote Now'" v-motion-slide-bottom show-share>
       <h2 class="text-3xl font-black mb-8 leading-tight">{{ poll.question }}</h2>
 
       <div v-if="!hasVoted" class="flex flex-col gap-4">
