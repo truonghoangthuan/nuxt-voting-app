@@ -1,7 +1,7 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
   const storage = usePollStorage();
-  const poll = storage.get(id!);
+  const poll = await storage.get(id!);
 
   if (!poll) {
     throw createError({

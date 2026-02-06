@@ -1,4 +1,4 @@
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id');
   const storage = usePollStorage();
 
@@ -8,13 +8,13 @@ export default defineEventHandler((event) => {
   setHeader(event, 'Connection', 'keep-alive');
 
   // Send initial state
-  const poll = storage.get(id!);
+  const poll = await storage.get(id!);
   if (poll) {
     event.node.res.write(`data: ${JSON.stringify(poll)}\n\n`);
   }
 
   // Subscribe to updates
-  storage.subscribe(id!, event);
+  await storage.subscribe(id!, event);
 
   // Keep connection alive
   const keepAlive = setInterval(() => {

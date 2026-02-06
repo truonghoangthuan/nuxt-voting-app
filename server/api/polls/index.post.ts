@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const storage = usePollStorage();
-  const poll = storage.create(question, options);
+  const poll = await storage.create(question, options);
 
   return poll;
 });

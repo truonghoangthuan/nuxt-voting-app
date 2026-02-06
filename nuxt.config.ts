@@ -8,6 +8,13 @@ export default defineNuxtConfig({
     },
   },
   modules: ['@vueuse/motion/nuxt'],
+  runtimeConfig: {
+    firebase: {
+      projectId: '',
+      clientEmail: '',
+      privateKey: '',
+    },
+  },
   components: [
     {
       path: '~/components',

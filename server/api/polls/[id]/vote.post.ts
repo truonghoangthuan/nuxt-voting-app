@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const { optionId, voterName } = body;
 
   const storage = usePollStorage();
-  const success = storage.vote(id!, optionId, voterName);
+  const success = await storage.vote(id!, optionId, voterName);
 
   if (!success) {
     throw createError({
