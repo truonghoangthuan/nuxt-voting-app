@@ -1,5 +1,6 @@
 import type { H3Event } from 'h3';
 import { FieldValue } from 'firebase-admin/firestore';
+import type { QueryDocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { firestore } from './firebase';
 
 export interface PollOption {
@@ -23,7 +24,7 @@ const listeners: Record<string, () => void> = {};
 export const usePollStorage = () => {
   const getAll = async (): Promise<Poll[]> => {
     const snapshot = await firestore.collection('polls').get();
-    return snapshot.docs.map((doc: any) => doc.data() as Poll);
+    return snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data() as Poll);
   };
 
   const get = async (id: string): Promise<Poll | null> => {
@@ -43,7 +44,7 @@ export const usePollStorage = () => {
         voters: [],
       })),
     };
-    
+
     await firestore.collection('polls').doc(id).set(poll);
     return poll;
   };
@@ -52,30 +53,35 @@ export const usePollStorage = () => {
     const pollRef = firestore.collection('polls').doc(pollId);
 
     try {
-      await firestore.runTransaction(async (t: any) => {
+      await firestore.runTransaction(async (t: Transaction) => {
         const doc = await t.get(pollRef);
         if (!doc.exists) throw new Error('Poll not found');
 
         const poll = doc.data() as Poll;
         const optionIndex = poll.options.findIndex((o) => o.id === optionId);
-        
+
         if (optionIndex === -1) throw new Error('Option not found');
 
-        // Update in memory first to construct the update path or object
-        // Since we are storing options as an array, we need to update the whole array or use a more complex field path.
-        // For simplicity and to ensure consistency, we'll read, modify, and set (or update) the whole options array or specific object.
-        // However, updating nested array items in Firestore is tricky without reading.
-        // We already read it.
-        
-        poll.options[optionIndex].votes++;
+        // Create a deep copy of the options array to modify
+        const updatedOptions: PollOption[] = [...poll.options];
+        const targetOption = updatedOptions[optionIndex];
+
+        if (!targetOption) throw new Error('Option structure invalid');
+
+        const updatedOption: PollOption = {
+          ...targetOption,
+          voters: targetOption.voters ? [...targetOption.voters] : [],
+        };
+
+        updatedOption.votes += 1;
+
         if (voterName) {
-           if (!poll.options[optionIndex].voters) {
-             poll.options[optionIndex].voters = [];
-           }
-           poll.options[optionIndex].voters.push(voterName);
+          updatedOption.voters = updatedOption.voters ? [...updatedOption.voters, voterName] : [voterName];
         }
 
-        t.update(pollRef, { options: poll.options });
+        updatedOptions[optionIndex] = updatedOption;
+
+        t.update(pollRef, { options: updatedOptions });
       });
       return true;
     } catch (e) {
@@ -93,13 +99,16 @@ export const usePollStorage = () => {
 
     // If this is the first client, start listening to Firestore
     if (!listeners[pollId]) {
-       const unsubscribe = firestore.collection('polls').doc(pollId).onSnapshot((doc) => {
+      const unsubscribe = firestore
+        .collection('polls')
+        .doc(pollId)
+        .onSnapshot((doc) => {
           if (doc.exists) {
             const poll = doc.data() as Poll;
             broadcast(pollId, poll);
           }
-       });
-       listeners[pollId] = unsubscribe;
+        });
+      listeners[pollId] = unsubscribe;
     }
 
     // Clean up on close

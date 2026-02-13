@@ -5,7 +5,7 @@ const { userName } = useUser();
 </script>
 
 <template>
-  <div v-if="userName" class="fixed top-4 right-4 z-40 max-w-[200px]" v-motion-slide-top>
+  <div v-if="userName" class="fixed top-4 right-4 z-40 max-w-[calc(100vw-2rem)] sm:max-w-[200px]" v-motion-slide-top>
     <div
       class="bg-neo-accent border-3 border-neo-black p-3 shadow-neo transition-all duration-300 hover:scale-110 hover:-rotate-3 hover:bg-neo-danger hover:shadow-neo-lg group cursor-help"
     >

@@ -6,37 +6,32 @@ const { createPoll } = usePolls();
 const router = useRouter();
 
 const addOption = () => {
-  options.value.push('');
+  options.value = [...options.value, ''];
 };
 
 const removeOption = (index: number) => {
   if (options.value.length > 2) {
-    options.value.splice(index, 1);
+    options.value = options.value.filter((_, i) => i !== index);
   }
 };
 
 const handleFileUpload = (content: string) => {
-  const newOptions = content
+  const fileOptions = content
     .split(',')
     .map((o) => o.trim())
     .filter((o) => o);
-  if (newOptions.length > 0) {
-    // Determine if we should append or replace.
-    // Logic: If there are only empty options (initial state), replace them.
-    // Otherwise, append.
-    const hasExistingContent = options.value.some((o) => o.trim() !== '');
 
-    if (!hasExistingContent) {
-      options.value = newOptions;
-    } else {
-      options.value.push(...newOptions);
-    }
+  if (fileOptions.length === 0) return;
 
-    // Ensure we have at least 2 empty options if the result is too short (though unlikely with file upload)
-    while (options.value.length < 2) {
-      options.value.push('');
-    }
+  const hasExistingContent = options.value.some((o) => o.trim() !== '');
+  let newOptions = hasExistingContent ? [...options.value, ...fileOptions] : [...fileOptions];
+
+  // Ensure minimum 2 options
+  while (newOptions.length < 2) {
+    newOptions = [...newOptions, ''];
   }
+
+  options.value = newOptions;
 };
 
 const handleCreate = async () => {
@@ -92,6 +87,7 @@ const handleCreate = async () => {
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
+                  aria-hidden="true"
                 >
                   <line x1="12" y1="5" x2="12" y2="19"></line>
                   <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -104,6 +100,7 @@ const handleCreate = async () => {
               class="flex items-center justify-center w-12 h-12 rounded-full border-3 border-neo-black bg-sky-200 text-neo-black hover:bg-sky-400 font-bold shadow-neo active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
               @click="showHelp = true"
               title="Upload Help"
+              aria-label="Upload Help"
             >
               ?
             </button>
