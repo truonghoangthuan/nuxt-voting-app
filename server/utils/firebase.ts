@@ -10,9 +10,14 @@ const firebaseConfig = {
 };
 
 if (getApps().length === 0) {
-  initializeApp({
-    credential: cert(firebaseConfig),
-  });
+  try {
+    initializeApp({
+      credential: cert(firebaseConfig),
+    });
+    console.log('Firebase initialized successfully');
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+  }
 }
 
 export const firestore = getFirestore();
