@@ -14,6 +14,16 @@ export default defineNuxtConfig({
       clientEmail: '',
       privateKey: '',
     },
+    public: {
+      firebase: {
+        apiKey: '',
+        authDomain: '',
+        projectId: '',
+        storageBucket: '',
+        messagingSenderId: '',
+        appId: '',
+      },
+    },
   },
   components: [
     {
