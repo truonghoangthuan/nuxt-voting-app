@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { useUser } from '../composables/useUser';
 import { useAuth } from '../composables/useAuth';
 
-const { userName } = useUser();
 const { user, logout } = useAuth();
 const router = useRouter();
 
 const displayName = computed(() => {
-  if (user.value) {
-    return user.value.email?.split('@')[0] || 'User';
+  if (user.value?.email) {
+    return user.value.email.split('@')[0];
   }
-  return userName.value || 'Guest';
+  return 'Guest';
 });
 
 const handleLogout = async () => {

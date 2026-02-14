@@ -6,6 +6,5 @@ import './assets/css/main.css';
   <div class="min-h-screen bg-neo-bg text-neo-text font-sans selection:bg-neo-main selection:text-black">
     <WelcomeBanner />
     <NuxtPage />
-    <UserNameDialog />
   </div>
 </template>

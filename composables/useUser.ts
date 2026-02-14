@@ -1,20 +1,16 @@
 export const useUser = () => {
-  const USER_STORAGE_KEY = 'user_name';
-  const userName = useState<string | null>('user_name', () => null);
+  const { user } = useAuth();
 
-  const init = () => {
-    if (import.meta.server) return;
-    const stored = localStorage.getItem(USER_STORAGE_KEY);
-    if (stored) {
-      userName.value = stored;
+  const userName = computed(() => {
+    if (user.value?.email) {
+      return user.value.email.split('@')[0];
     }
-  };
+    return 'Guest';
+  });
 
-  const setUserName = (name: string) => {
-    if (import.meta.server) return;
-    localStorage.setItem(USER_STORAGE_KEY, name);
-    userName.value = name;
-  };
+  // Deprecated/No-op functions for compatibility during refactor
+  const init = () => {};
+  const setUserName = (name: string) => {};
 
   return {
     userName,
