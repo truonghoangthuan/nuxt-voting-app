@@ -15,6 +15,7 @@ export interface Poll {
   question: string;
   options: PollOption[];
   participants: string[]; // List of user IDs who have voted
+  createdAt: number;
 }
 
 // Store active SSE connections locally
@@ -52,6 +53,7 @@ export const usePollStorage = () => {
         voters: [],
       })),
       participants: [],
+      createdAt: Date.now(),
     };
 
     await firestore.collection('polls').doc(id).set(poll);

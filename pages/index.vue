@@ -28,7 +28,10 @@ const fetchPolls = async () => {
   if (user.value?.uid) {
     try {
       const polls = await getJoinedPolls(user.value.uid);
-      joinedPolls.value = polls.value || [];
+      const allPolls = polls.value || [];
+      // Sort by createdAt descending (newest first)
+      // Use 0 as fallback for legacy polls without createdAt
+      joinedPolls.value = allPolls.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
     } catch (e) {
       console.error('Failed to fetch polls', e);
     } finally {
@@ -45,6 +48,15 @@ const goToPoll = (id: string) => {
 
 const goToCreate = () => {
   router.push('/create');
+};
+
+const formatDate = (timestamp?: number) => {
+  if (!timestamp) return '';
+  return new Date(timestamp).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 };
 </script>
 
@@ -103,12 +115,20 @@ const goToCreate = () => {
             </svg>
           </div>
 
-          <h3 class="text-xl font-bold mb-4 line-clamp-2 leading-tight flex-grow">
-            {{ poll.question }}
-          </h3>
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-xl font-bold line-clamp-2 leading-tight flex-grow pr-2">
+              {{ poll.question }}
+            </h3>
+          </div>
+
+          <div v-if="poll.createdAt" class="text-xs font-bold text-gray-400 mb-4 uppercase tracking-wider">
+            Created: {{ formatDate(poll.createdAt) }}
+          </div>
+          <div v-else class="mb-4"></div>
+          <!-- Spacer for missing date -->
 
           <div
-            class="mt-4 pt-4 border-t-2 border-gray-100 flex justify-between items-center text-sm font-bold text-gray-500"
+            class="mt-auto pt-4 border-t-2 border-gray-100 flex justify-between items-center text-sm font-bold text-gray-500"
           >
             <span>{{ poll.options.length }} Options</span>
             <span class="bg-neo-bg px-2 py-1 border border-neo-black text-neo-black text-xs">
