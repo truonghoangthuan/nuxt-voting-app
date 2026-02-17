@@ -66,6 +66,10 @@ const getPercentage = (votes: number) => {
 
 <template>
   <div class="container mx-auto max-w-2xl pt-20 px-4">
+    <div class="mb-6">
+      <NeoButton variant="secondary" @click="router.push('/')" icon="arrow-left"> Back to Home </NeoButton>
+    </div>
+
     <div v-if="!poll" class="text-center">
       <NeoCard title="404">
         <p class="text-xl mb-4">Poll not found!</p>

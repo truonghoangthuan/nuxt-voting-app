@@ -49,6 +49,10 @@ const handleCreate = async () => {
 
 <template>
   <div class="container mx-auto max-w-2xl pt-20 px-4">
+    <div class="mb-6">
+      <NeoButton variant="secondary" @click="router.push('/')" icon="arrow-left"> Back to Home </NeoButton>
+    </div>
+
     <NeoCard title="Create New Poll" v-motion-slide-bottom>
       <div class="flex flex-col gap-6">
         <NeoInput v-model="question" label="Question" placeholder="What do you want to ask?" />
