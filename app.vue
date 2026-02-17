@@ -9,7 +9,8 @@ const router = useRouter();
 // Watch for auth state changes to redirect from public pages if logged in
 watch(user, (newUser) => {
   if (newUser && ['/login', '/register'].includes(route.path)) {
-    router.push('/');
+    const redirectPath = (route.query.redirect as string) || '/';
+    router.push(redirectPath);
   }
 });
 </script>

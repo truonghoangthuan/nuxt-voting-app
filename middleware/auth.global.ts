@@ -13,6 +13,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   // If user is not logged in
   if (!user.value) {
-    return navigateTo('/login');
+    return navigateTo({
+      path: '/login',
+      query: {
+        redirect: to.fullPath,
+      },
+    });
   }
 });

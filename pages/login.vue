@@ -11,7 +11,8 @@ const handleLogin = async () => {
 
   try {
     await login(email.value, password.value);
-    router.push('/');
+    const redirectPath = (useRoute().query.redirect as string) || '/';
+    router.push(redirectPath);
   } catch (e) {
     // Error is handled in composable state
   }
