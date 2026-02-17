@@ -14,6 +14,7 @@ export interface Poll {
   id: string;
   question: string;
   options: PollOption[];
+  participants: string[]; // List of user IDs who have voted
 }
 
 // Store active SSE connections locally
@@ -24,6 +25,13 @@ const listeners: Record<string, () => void> = {};
 export const usePollStorage = () => {
   const getAll = async (): Promise<Poll[]> => {
     const snapshot = await firestore.collection('polls').get();
+    return snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data() as Poll);
+  };
+
+  const getJoinedPolls = async (userId: string): Promise<Poll[]> => {
+    // Firestore query specifically for array-contains
+    const snapshot = await firestore.collection('polls').where('participants', 'array-contains', userId).get();
+
     return snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data() as Poll);
   };
 
@@ -43,13 +51,14 @@ export const usePollStorage = () => {
         votes: 0,
         voters: [],
       })),
+      participants: [],
     };
 
     await firestore.collection('polls').doc(id).set(poll);
     return poll;
   };
 
-  const vote = async (pollId: string, optionId: string, voterName?: string) => {
+  const vote = async (pollId: string, optionId: string, voterName?: string, userId?: string) => {
     const pollRef = firestore.collection('polls').doc(pollId);
 
     try {
@@ -81,7 +90,19 @@ export const usePollStorage = () => {
 
         updatedOptions[optionIndex] = updatedOption;
 
-        t.update(pollRef, { options: updatedOptions });
+        const updateData: any = { options: updatedOptions };
+
+        // If userId is provided, add it to participants list
+        if (userId) {
+          // We use arrayUnion to avoid duplicates safely, but inside transaction we need to be careful.
+          // Since we are reading the doc, we can just check deeply.
+          const currentParticipants = poll.participants || [];
+          if (!currentParticipants.includes(userId)) {
+            updateData.participants = FieldValue.arrayUnion(userId);
+          }
+        }
+
+        t.update(pollRef, updateData);
       });
       return true;
     } catch (e) {
@@ -139,6 +160,7 @@ export const usePollStorage = () => {
 
   return {
     getAll,
+    getJoinedPolls,
     get,
     create,
     vote,

@@ -1,125 +1,122 @@
 <script setup lang="ts">
-const question = ref('');
-const options = ref(['', '']);
-const showHelp = ref(false);
-const { createPoll } = usePolls();
+import { useAuth } from '~/composables/useAuth';
+import { usePolls } from '~/composables/usePolls';
+import type { Poll } from '~/server/utils/storage';
+
+const { user, loading: authLoading } = useAuth();
+const { getJoinedPolls } = usePolls();
 const router = useRouter();
 
-const addOption = () => {
-  options.value = [...options.value, ''];
-};
+const joinedPolls = ref<Poll[]>([]);
+const loading = ref(true);
 
-const removeOption = (index: number) => {
-  if (options.value.length > 2) {
-    options.value = options.value.filter((_, i) => i !== index);
+onMounted(async () => {
+  // Wait for auth to be ready if it's loading
+  if (authLoading.value) {
+    const unwatch = watch(authLoading, async (newVal) => {
+      if (!newVal) {
+        unwatch();
+        await fetchPolls();
+      }
+    });
+  } else {
+    await fetchPolls();
   }
-};
+});
 
-const handleFileUpload = (content: string) => {
-  const fileOptions = content
-    .split(',')
-    .map((o) => o.trim())
-    .filter((o) => o);
-
-  if (fileOptions.length === 0) return;
-
-  const hasExistingContent = options.value.some((o) => o.trim() !== '');
-  let newOptions = hasExistingContent ? [...options.value, ...fileOptions] : [...fileOptions];
-
-  // Ensure minimum 2 options
-  while (newOptions.length < 2) {
-    newOptions = [...newOptions, ''];
-  }
-
-  options.value = newOptions;
-};
-
-const handleCreate = async () => {
-  const validOptions = options.value.filter((o) => o.trim());
-  if (question.value.trim() && validOptions.length >= 2) {
-    const id = await createPoll(question.value, validOptions);
-    if (id) {
-      router.push(`/vote/${id}`);
+const fetchPolls = async () => {
+  if (user.value?.uid) {
+    try {
+      const polls = await getJoinedPolls(user.value.uid);
+      joinedPolls.value = polls.value || [];
+    } catch (e) {
+      console.error('Failed to fetch polls', e);
+    } finally {
+      loading.value = false;
     }
   } else {
-    alert('Please enter a question and at least 2 options!');
+    loading.value = false;
   }
+};
+
+const goToPoll = (id: string) => {
+  router.push(`/vote/${id}`);
+};
+
+const goToCreate = () => {
+  router.push('/create');
 };
 </script>
 
 <template>
-  <div class="container mx-auto max-w-2xl pt-20 px-4">
-    <NeoCard title="Create New Poll" v-motion-slide-bottom>
-      <div class="flex flex-col gap-6">
-        <NeoInput v-model="question" label="Question" placeholder="What do you want to ask?" />
+  <div class="container mx-auto max-w-4xl pt-20 px-4 pb-12">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <h1 class="text-4xl font-black uppercase tracking-tight">My Joined Polls</h1>
+      <NeoButton variant="primary" @click="goToCreate" icon="plus"> Create New Poll </NeoButton>
+    </div>
 
-        <div class="flex flex-col gap-4">
-          <label class="font-bold text-lg uppercase">Options</label>
-          <div
-            v-for="(option, index) in options"
-            :key="index"
-            class="flex items-center gap-2"
-            v-motion-slide-right
-            :delay="index * 100"
-          >
-            <div class="flex-grow">
-              <NeoInput
-                :model-value="options[index] as string"
-                @update:model-value="options[index] = $event"
-                :placeholder="`Option ${index + 1}`"
-              />
-            </div>
-            <NeoButton v-if="options.length > 2" variant="danger" @click="removeOption(index)" class="mb-0 mr-0">
-              X
-            </NeoButton>
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-black"></div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="joinedPolls.length === 0" v-motion-fade>
+      <NeoCard class="text-center py-16">
+        <div class="text-6xl mb-6">🗳️</div>
+        <h2 class="text-2xl font-bold mb-2">No polls joined yet</h2>
+        <p class="text-gray-600 mb-8 max-w-md mx-auto">
+          You haven't participated in any polls yet. Why not create one or join existing ones?
+        </p>
+        <NeoButton variant="secondary" @click="goToCreate"> Create Your First Poll </NeoButton>
+      </NeoCard>
+    </div>
+
+    <!-- Polls Grid -->
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-for="(poll, index) in joinedPolls"
+        :key="poll.id"
+        v-motion-slide-visible-bottom
+        :delay="index * 100"
+        class="h-full"
+      >
+        <div
+          class="h-full flex flex-col bg-white border-3 border-neo-black shadow-neo hover:shadow-neo-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer p-6 relative group"
+          @click="goToPoll(poll.id)"
+        >
+          <div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
           </div>
 
-          <div class="flex gap-4">
-            <NeoButton variant="secondary" @click="addOption" class="self-start">
-              <div class="flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span>Add Option</span>
-              </div>
-            </NeoButton>
-            <NeoFileUpload @upload="handleFileUpload" />
-            <button
-              class="flex items-center justify-center w-12 h-12 rounded-full border-3 border-neo-black bg-sky-200 text-neo-black hover:bg-sky-400 font-bold shadow-neo active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
-              @click="showHelp = true"
-              title="Upload Help"
-              aria-label="Upload Help"
-            >
-              ?
-            </button>
+          <h3 class="text-xl font-bold mb-4 line-clamp-2 leading-tight flex-grow">
+            {{ poll.question }}
+          </h3>
+
+          <div
+            class="mt-4 pt-4 border-t-2 border-gray-100 flex justify-between items-center text-sm font-bold text-gray-500"
+          >
+            <span>{{ poll.options.length }} Options</span>
+            <span class="bg-neo-bg px-2 py-1 border border-neo-black text-neo-black text-xs">
+              {{ poll.options.reduce((acc, curr) => acc + curr.votes, 0) }} Votes
+            </span>
           </div>
         </div>
-
-        <div class="border-t-3 border-neo-black my-2"></div>
-
-        <NeoButton block variant="primary" @click="handleCreate" class="text-xl py-4"> CREATE POLL </NeoButton>
       </div>
-    </NeoCard>
-
-    <NeoDialog v-model="showHelp" title="Upload Options Format">
-      <div class="space-y-4">
-        <p>You can upload a text file (.txt or .csv) to automatically populate the poll options.</p>
-        <p class="font-bold">Supported format:</p>
-        <code class="block bg-gray-100 p-3 border-2 border-neo-black rounded-lg"> Option 1, Option 2, Option 3 </code>
-        <p>Values should be separated by commas.</p>
-      </div>
-    </NeoDialog>
+    </div>
   </div>
 </template>

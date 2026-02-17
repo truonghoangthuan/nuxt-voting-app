@@ -31,7 +31,8 @@ if (pollRef.value) {
 
 const handleVote = async () => {
   if (selectedOption.value) {
-    await vote(pollId, selectedOption.value, userName.value);
+    const { user } = useAuth();
+    await vote(pollId, selectedOption.value, userName.value, user.value?.uid);
     markVoted(pollId, selectedOption.value);
     hasVoted.value = true;
   }

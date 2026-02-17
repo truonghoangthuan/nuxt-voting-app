@@ -14,10 +14,17 @@ export const usePolls = () => {
     return data;
   };
 
-  const vote = async (pollId: string, optionId: string, voterName?: string | null) => {
+  const getJoinedPolls = async (userId: string) => {
+    const { data } = await useFetch<Poll[]>('/api/polls/user/joined', {
+      params: { userId },
+    });
+    return data;
+  };
+
+  const vote = async (pollId: string, optionId: string, voterName?: string | null, userId?: string) => {
     await useFetch(`/api/polls/${pollId}/vote`, {
       method: 'POST',
-      body: { optionId, voterName },
+      body: { optionId, voterName, userId },
     });
   };
 
@@ -39,6 +46,7 @@ export const usePolls = () => {
   return {
     createPoll,
     getPoll,
+    getJoinedPolls,
     vote,
     subscribe,
   };
