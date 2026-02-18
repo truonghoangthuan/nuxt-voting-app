@@ -46,6 +46,22 @@ const handleCreate = async () => {
     alert('Please enter a question and at least 2 options!');
   }
 };
+
+watch(
+  options,
+  () => {
+    if (maxVotes.value > options.value.length) {
+      maxVotes.value = options.value.length;
+    }
+  },
+  { deep: true },
+);
+
+watch(maxVotes, () => {
+  if (maxVotes.value > options.value.length) {
+    maxVotes.value = options.value.length;
+  }
+});
 </script>
 
 <template>
@@ -60,7 +76,7 @@ const handleCreate = async () => {
 
         <div class="flex flex-col gap-2">
           <label class="font-bold text-lg uppercase">Max Votes per User</label>
-          <NeoInput v-model="maxVotes" type="number" min="1" placeholder="1" class="w-32" />
+          <NeoInput v-model="maxVotes" type="number" min="1" :max="options.length" placeholder="1" class="w-32" />
         </div>
 
         <div class="flex flex-col gap-4">
