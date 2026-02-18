@@ -9,6 +9,7 @@ const router = useRouter();
 
 const joinedPolls = ref<Poll[]>([]);
 const loading = ref(true);
+const isCreating = ref(false);
 
 onMounted(async () => {
   // Wait for auth to be ready if it's loading
@@ -46,8 +47,10 @@ const goToPoll = (id: string) => {
   router.push(`/vote/${id}`);
 };
 
-const goToCreate = () => {
-  router.push('/create');
+const goToCreate = async () => {
+  isCreating.value = true;
+  await router.push('/create');
+  isCreating.value = false;
 };
 
 const formatDate = (timestamp?: number) => {
@@ -64,7 +67,7 @@ const formatDate = (timestamp?: number) => {
   <div class="container mx-auto max-w-4xl pt-20 px-4 pb-12">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
       <h1 class="text-4xl font-black uppercase tracking-tight">My Joined Polls</h1>
-      <NeoButton variant="primary" @click="goToCreate" icon="plus"> Create New Poll </NeoButton>
+      <NeoButton variant="primary" @click="goToCreate" icon="plus" :loading="isCreating"> Create New Poll </NeoButton>
     </div>
 
     <!-- Loading State -->
@@ -80,7 +83,7 @@ const formatDate = (timestamp?: number) => {
         <p class="text-gray-600 mb-8 max-w-md mx-auto">
           You haven't participated in any polls yet. Why not create one or join existing ones?
         </p>
-        <NeoButton variant="secondary" @click="goToCreate"> Create Your First Poll </NeoButton>
+        <NeoButton variant="secondary" @click="goToCreate" :loading="isCreating"> Create Your First Poll </NeoButton>
       </NeoCard>
     </div>
 
