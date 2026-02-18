@@ -13,12 +13,15 @@ const { userName } = useUser();
 const pollId = route.params.id as string;
 
 const poll = ref<Poll | null>(null);
-const selectedOption = ref<string | null>(null);
+const selectedOptions = ref<string[]>([]);
 const userVoteCount = ref(0);
 const expandedOptionId = ref<string | null>(null);
 
 const maxVotes = computed(() => poll.value?.maxVotes || 1);
-const canVote = computed(() => userVoteCount.value < maxVotes.value);
+const remainingVotes = computed(() => maxVotes.value - userVoteCount.value);
+const canVote = computed(() => {
+  return selectedOptions.value.length > 0 && selectedOptions.value.length <= remainingVotes.value;
+});
 const isMaxVotesReached = computed(() => userVoteCount.value >= maxVotes.value);
 
 const pollRef = await getPoll(pollId);
@@ -29,27 +32,42 @@ if (pollRef.value) {
   }
 }
 
+const toggleOption = (optionId: string) => {
+  if (isOptionVoted(optionId)) return;
+
+  if (selectedOptions.value.includes(optionId)) {
+    selectedOptions.value = selectedOptions.value.filter((id) => id !== optionId);
+  } else {
+    if (selectedOptions.value.length < remainingVotes.value) {
+      selectedOptions.value.push(optionId);
+    }
+  }
+};
+
 const handleVote = async () => {
-  if (selectedOption.value && canVote.value) {
+  if (selectedOptions.value.length > 0 && canVote.value) {
     const { user } = useAuth();
-    const currentOptionId = selectedOption.value;
+    const currentOptionIds = [...selectedOptions.value];
 
     // Optimistic update: Update local poll state immediately
-    if (poll.value && user.value?.uid) {
-      const option = poll.value.options.find((o) => o.id === currentOptionId);
-      if (option) {
-        option.votes = (option.votes || 0) + 1;
-        if (!option.voterIds) option.voterIds = [];
-        option.voterIds.push(user.value.uid);
+    const userId = user.value?.uid;
+    if (poll.value && userId) {
+      currentOptionIds.forEach((optionId) => {
+        const option = poll.value!.options.find((o) => o.id === optionId);
+        if (option) {
+          option.votes = (option.votes || 0) + 1;
+          if (!option.voterIds) option.voterIds = [];
+          option.voterIds.push(userId);
 
-        // Also add to voters list for display if needed
-        if (userName.value) {
-          if (!option.voters) option.voters = [];
-          option.voters.push(userName.value);
+          // Also add to voters list for display if needed
+          if (userName.value) {
+            if (!option.voters) option.voters = [];
+            option.voters.push(userName.value);
+          }
         }
-      }
+      });
 
-      // Update participants list to prevent immediate re-vote if we rely on it
+      // Update participants list
       if (!poll.value.participants) poll.value.participants = [];
       if (!poll.value.participants.includes(user.value.uid)) {
         poll.value.participants.push(user.value.uid);
@@ -57,12 +75,12 @@ const handleVote = async () => {
     }
 
     // Update simple counter
-    userVoteCount.value++;
+    userVoteCount.value += currentOptionIds.length;
 
-    await vote(pollId, currentOptionId, userName.value, user.value?.uid);
+    await vote(pollId, currentOptionIds, userName.value, userId);
 
     // Reset selection
-    selectedOption.value = null;
+    selectedOptions.value = [];
   }
 };
 
@@ -77,6 +95,11 @@ onMounted(() => {
   // Subscribe to real-time updates
   unsubscribe = subscribe(pollId, (updatedPoll) => {
     poll.value = updatedPoll;
+    // Update local user vote count from fresh data if needed, or rely on local state
+    if (poll.value) {
+      // We might want to re-calc userVoteCount here to be safe, but useUserVotes depends on poll value
+      userVoteCount.value = getVoteCount(poll.value);
+    }
   });
 });
 
@@ -117,7 +140,7 @@ const getPercentage = (votes: number) => {
         v-if="maxVotes > 1"
         class="mb-6 bg-blue-50 border-2 border-blue-200 p-3 rounded text-blue-800 font-bold text-sm"
       >
-        <span class="mr-2">ℹ️</span> You have {{ maxVotes - userVoteCount }} votes remaining (Total: {{ maxVotes }})
+        <span class="mr-2">ℹ️</span> You have {{ remainingVotes }} votes remaining (Total: {{ maxVotes }})
       </div>
       <div v-else class="mb-6"></div>
 
@@ -125,11 +148,11 @@ const getPercentage = (votes: number) => {
         <button
           v-for="(option, index) in poll.options"
           :key="option.id"
-          @click="selectedOption = option.id"
+          @click="toggleOption(option.id)"
           :disabled="isOptionVoted(option.id)"
           class="relative w-full p-4 border-3 border-neo-black text-left font-bold text-xl transition-all duration-200 group overflow-hidden"
           :class="[
-            selectedOption === option.id
+            selectedOptions.includes(option.id)
               ? 'bg-neo-main shadow-none translate-x-[4px] translate-y-[4px]'
               : 'bg-neo-white shadow-neo hover:-translate-y-1 hover:shadow-neo-lg',
             isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-gray-100' : '',
@@ -137,7 +160,7 @@ const getPercentage = (votes: number) => {
         >
           <div class="relative z-10 flex justify-between items-center">
             <span>{{ option.text }}</span>
-            <span v-if="selectedOption === option.id" v-motion-pop> Selected </span>
+            <span v-if="selectedOptions.includes(option.id)" v-motion-pop> Selected </span>
             <span v-if="isOptionVoted(option.id)" class="text-sm bg-gray-200 px-2 py-1 border border-gray-400"
               >VOTED</span
             >
@@ -146,38 +169,15 @@ const getPercentage = (votes: number) => {
 
         <div class="mt-6 flex justify-end">
           <NeoButton
-            v-if="selectedOption"
+            v-if="selectedOptions.length > 0"
             variant="black"
             @click="handleVote"
             v-motion-pop
             class="text-xl px-12"
             :disabled="!canVote"
           >
-            VOTE ({{ userVoteCount }}/{{ maxVotes }})
+            VOTE ({{ selectedOptions.length }})
           </NeoButton>
-        </div>
-
-        <!-- Show partial results or previously voted options if any -->
-        <div v-if="userVoteCount > 0" class="mt-8 border-t-2 border-gray-200 pt-4">
-          <h3 class="text-lg font-bold mb-4 uppercase text-gray-500">Current Results</h3>
-          <div class="flex flex-col gap-4">
-            <div
-              v-for="(option, index) in poll.options"
-              :key="option.id"
-              class="relative w-full border-2 border-gray-300 bg-gray-50"
-            >
-              <div class="p-3 relative z-10">
-                <div
-                  class="absolute top-0 left-0 bottom-0 bg-gray-200 transition-all duration-1000 ease-out"
-                  :style="{ width: `${getPercentage(option.votes)}%` }"
-                ></div>
-                <div class="relative z-10 flex justify-between font-bold text-md items-center text-gray-600">
-                  <span>{{ option.text }}</span>
-                  <span>{{ getPercentage(option.votes) }}%</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

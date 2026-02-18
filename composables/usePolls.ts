@@ -21,10 +21,10 @@ export const usePolls = () => {
     return data;
   };
 
-  const vote = async (pollId: string, optionId: string, voterName?: string | null, userId?: string) => {
+  const vote = async (pollId: string, optionIds: string[], voterName?: string | null, userId?: string) => {
     await useFetch(`/api/polls/${pollId}/vote`, {
       method: 'POST',
-      body: { optionId, voterName, userId },
+      body: { optionIds, voterName, userId },
     });
   };
 
