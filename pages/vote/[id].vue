@@ -8,7 +8,7 @@ import { useUserVotes } from '~/composables/useUserVotes';
 const route = useRoute();
 const router = useRouter();
 const { getPoll, vote, subscribe } = usePolls();
-const { getVoteCount, markVoted, hasVotedForOption } = useUserVotes();
+const { getVoteCount, hasVotedForOption } = useUserVotes();
 const { userName } = useUser();
 const pollId = route.params.id as string;
 
@@ -24,18 +24,42 @@ const isMaxVotesReached = computed(() => userVoteCount.value >= maxVotes.value);
 const pollRef = await getPoll(pollId);
 if (pollRef.value) {
   poll.value = pollRef.value;
-  userVoteCount.value = getVoteCount(pollId);
+  if (poll.value) {
+    userVoteCount.value = getVoteCount(poll.value);
+  }
 }
 
 const handleVote = async () => {
   if (selectedOption.value && canVote.value) {
     const { user } = useAuth();
+    const currentOptionId = selectedOption.value;
 
-    // Optimistic update
-    markVoted(pollId, selectedOption.value);
+    // Optimistic update: Update local poll state immediately
+    if (poll.value && user.value?.uid) {
+      const option = poll.value.options.find((o) => o.id === currentOptionId);
+      if (option) {
+        option.votes = (option.votes || 0) + 1;
+        if (!option.voterIds) option.voterIds = [];
+        option.voterIds.push(user.value.uid);
+
+        // Also add to voters list for display if needed
+        if (userName.value) {
+          if (!option.voters) option.voters = [];
+          option.voters.push(userName.value);
+        }
+      }
+
+      // Update participants list to prevent immediate re-vote if we rely on it
+      if (!poll.value.participants) poll.value.participants = [];
+      if (!poll.value.participants.includes(user.value.uid)) {
+        poll.value.participants.push(user.value.uid);
+      }
+    }
+
+    // Update simple counter
     userVoteCount.value++;
 
-    await vote(pollId, selectedOption.value, userName.value, user.value?.uid);
+    await vote(pollId, currentOptionId, userName.value, user.value?.uid);
 
     // Reset selection
     selectedOption.value = null;
@@ -43,7 +67,8 @@ const handleVote = async () => {
 };
 
 const isOptionVoted = (optionId: string) => {
-  return hasVotedForOption(pollId, optionId);
+  if (!poll.value) return false;
+  return hasVotedForOption(poll.value, optionId);
 };
 
 let unsubscribe: (() => void) | undefined;

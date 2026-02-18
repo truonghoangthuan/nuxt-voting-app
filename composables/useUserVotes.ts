@@ -1,58 +1,44 @@
+import type { Poll } from '~/server/utils/storage';
+
 export const useUserVotes = () => {
-  const VOTES_STORAGE_KEY = 'voted_polls';
+  const { user } = useAuth();
 
-  const getStoredVotes = (): Record<string, string[]> => {
-    if (import.meta.server) return {};
-    const stored = localStorage.getItem(VOTES_STORAGE_KEY);
-    const parsed = stored ? JSON.parse(stored) : {};
+  const hasVoted = (poll: Poll): boolean => {
+    if (!poll || !user.value?.uid) return false;
 
-    // Migrate legacy data (string -> string[])
-    Object.keys(parsed).forEach((key) => {
-      if (typeof parsed[key] === 'string') {
-        parsed[key] = [parsed[key]];
+    // Check if user is in participants list
+    return poll.participants?.includes(user.value.uid) || false;
+  };
+
+  const getVoteCount = (poll: Poll): number => {
+    if (!poll || !user.value?.uid) return 0;
+
+    let count = 0;
+    poll.options.forEach((option) => {
+      if (option.voterIds?.includes(user.value!.uid)) {
+        count++;
       }
     });
-
-    return parsed;
+    return count;
   };
 
-  const hasVoted = (pollId: string): boolean => {
-    const votes = getStoredVotes();
-    return !!votes[pollId] && votes[pollId].length > 0;
+  const hasVotedForOption = (poll: Poll, optionId: string): boolean => {
+    if (!poll || !user.value?.uid) return false;
+
+    const option = poll.options.find((o) => o.id === optionId);
+    return option?.voterIds?.includes(user.value.uid) || false;
   };
 
-  const getVoteCount = (pollId: string): number => {
-    const votes = getStoredVotes();
-    return votes[pollId]?.length || 0;
-  };
+  const getVotedOptions = (poll: Poll): string[] => {
+    if (!poll || !user.value?.uid) return [];
 
-  const hasVotedForOption = (pollId: string, optionId: string): boolean => {
-    const votes = getStoredVotes();
-    return votes[pollId]?.includes(optionId) || false;
-  };
-
-  const getVotedOptions = (pollId: string): string[] => {
-    const votes = getStoredVotes();
-    return votes[pollId] || [];
-  };
-
-  const markVoted = (pollId: string, optionId: string) => {
-    if (import.meta.server) return;
-    const votes = getStoredVotes();
-    if (!votes[pollId]) {
-      votes[pollId] = [];
-    }
-    if (!votes[pollId].includes(optionId)) {
-      votes[pollId].push(optionId);
-    }
-    localStorage.setItem(VOTES_STORAGE_KEY, JSON.stringify(votes));
+    return poll.options.filter((option) => option.voterIds?.includes(user.value!.uid)).map((option) => option.id);
   };
 
   return {
     hasVoted,
-    getVotedOptions, // Replaces getVotedOption
-    markVoted,
     getVoteCount,
     hasVotedForOption,
+    getVotedOptions,
   };
 };
