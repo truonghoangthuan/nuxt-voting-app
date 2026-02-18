@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const question = ref('');
 const options = ref(['', '']);
+const maxVotes = ref(1);
 const showHelp = ref(false);
 const { createPoll } = usePolls();
 const router = useRouter();
@@ -37,7 +38,7 @@ const handleFileUpload = (content: string) => {
 const handleCreate = async () => {
   const validOptions = options.value.filter((o) => o.trim());
   if (question.value.trim() && validOptions.length >= 2) {
-    const id = await createPoll(question.value, validOptions);
+    const id = await createPoll(question.value, validOptions, parseInt(maxVotes.value.toString(), 10));
     if (id) {
       router.push(`/vote/${id}`);
     }
@@ -57,6 +58,11 @@ const handleCreate = async () => {
       <div class="flex flex-col gap-6">
         <NeoInput v-model="question" label="Question" placeholder="What do you want to ask?" />
 
+        <div class="flex flex-col gap-2">
+          <label class="font-bold text-lg uppercase">Max Votes per User</label>
+          <NeoInput v-model="maxVotes" type="number" min="1" placeholder="1" class="w-32" />
+        </div>
+
         <div class="flex flex-col gap-4">
           <label class="font-bold text-lg uppercase">Options</label>
           <div
@@ -69,7 +75,7 @@ const handleCreate = async () => {
             <div class="flex-grow">
               <NeoInput
                 :model-value="options[index] as string"
-                @update:model-value="options[index] = $event"
+                @update:model-value="options[index] = $event as string"
                 :placeholder="`Option ${index + 1}`"
               />
             </div>

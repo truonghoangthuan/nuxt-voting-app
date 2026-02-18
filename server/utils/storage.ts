@@ -8,6 +8,7 @@ export interface PollOption {
   text: string;
   votes: number;
   voters: string[] | null;
+  voterIds?: string[]; // IDs of users who voted for this option
 }
 
 export interface Poll {
@@ -16,6 +17,7 @@ export interface Poll {
   options: PollOption[];
   participants: string[]; // List of user IDs who have voted
   createdAt: number;
+  maxVotes?: number;
 }
 
 // Store active SSE connections locally
@@ -41,7 +43,7 @@ export const usePollStorage = () => {
     return doc.exists ? (doc.data() as Poll) : null;
   };
 
-  const create = async (question: string, options: string[]) => {
+  const create = async (question: string, options: string[], maxVotes: number = 1) => {
     const id = Math.random().toString(36).substring(2, 9);
     const poll: Poll = {
       id,
@@ -54,6 +56,7 @@ export const usePollStorage = () => {
       })),
       participants: [],
       createdAt: Date.now(),
+      maxVotes,
     };
 
     await firestore.collection('polls').doc(id).set(poll);
@@ -94,10 +97,62 @@ export const usePollStorage = () => {
 
         const updateData: any = { options: updatedOptions };
 
-        // If userId is provided, add it to participants list
+        // If userId is provided, add it to participants list and check maxVotes
         if (userId) {
-          // We use arrayUnion to avoid duplicates safely, but inside transaction we need to be careful.
-          // Since we are reading the doc, we can just check deeply.
+          // Check max votes
+          const maxVotes = poll.maxVotes || 1;
+          let userTotalVotes = 0;
+
+          updatedOptions.forEach((opt) => {
+            if (opt.voterIds && opt.voterIds.includes(userId)) {
+              // Count how many times this user appears in voterIds
+              // Since array-contains checks for existence, we might need a better way if we allow multiple votes on SAME option?
+              // Implementation plan says "users can cast votes for multiple options".
+              // Usually one vote per option is standard, but maxVotes allows voting for X different options.
+              // Or X votes total? Let's assume X votes total, allowing multiple on same option?
+              // The UI usually toggles. Let's assume 1 vote per option, but max N options.
+              // IF we want to allow multiple votes on same option, we need array that stores duplicates or counts.
+              // For simplicity and typical UI (toggle), let's say "Select up to N options".
+              // So one vote per option.
+              // Wait, if I use `voterIds.includes(userId)`, I'm counting options voted for.
+              // BUT, `voterIds` needs to be initialized.
+            }
+            // Count occurrences if we store duplicates, or just count options if set.
+            // Let's count options the user has voted for.
+            if (opt.voterIds?.includes(userId)) {
+              userTotalVotes++;
+            }
+          });
+
+          if (userTotalVotes >= maxVotes) {
+            // Check if user is UNVOTING (toggling off) - handled by UI?
+            // The vote function currently only ADDS vote (increments).
+            // It doesn't handle unvoting.
+            // If the user already voted for THIS option, and they click again, the UI might calculate valid state.
+            // But here we are VALIDATING a NEW vote.
+            // If user already voted for this option, we shouldn't be here if it's a simple increment?
+            // The current implementation is simple increment.
+
+            // If we want to support unvoting, we need a toggle logic.
+            // For now, let's stick to "adding a vote".
+            // If user already voted for THIS option, return false or error?
+
+            if (updatedOptions[optionIndex].voterIds?.includes(userId)) {
+              // Already voted for this option. Do nothing or throw?
+              // If we want to allow un-voting, we need a separate `removeVote` or `toggleVote`.
+              // Existing code just does `updatedOption.votes += 1`.
+              // Let's assume for now we only ADD votes.
+              throw new Error('Already voted for this option');
+            }
+
+            if (userTotalVotes >= maxVotes) {
+              throw new Error(`Max votes (${maxVotes}) reached`);
+            }
+          }
+
+          // Add userId to option's voterIds
+          updatedOption.voterIds = updatedOption.voterIds ? [...updatedOption.voterIds, userId] : [userId];
+
           const currentParticipants = poll.participants || [];
           if (!currentParticipants.includes(userId)) {
             updateData.participants = FieldValue.arrayUnion(userId);

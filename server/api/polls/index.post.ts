@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { question, options } = body;
+  const { question, options, maxVotes } = body;
 
   if (!question || !options || !Array.isArray(options) || options.length < 2) {
     throw createError({
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const storage = usePollStorage();
-  const poll = await storage.create(question, options);
+  const poll = await storage.create(question, options, maxVotes);
 
   return poll;
 });

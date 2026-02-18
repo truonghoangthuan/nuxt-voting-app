@@ -1,10 +1,10 @@
 import type { Poll } from '~/server/utils/storage';
 
 export const usePolls = () => {
-  const createPoll = async (question: string, options: string[]) => {
+  const createPoll = async (question: string, options: string[], maxVotes: number = 1) => {
     const { data } = await useFetch<Poll>('/api/polls', {
       method: 'POST',
-      body: { question, options },
+      body: { question, options, maxVotes },
     });
     return data.value?.id;
   };

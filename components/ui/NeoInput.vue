@@ -1,6 +1,6 @@
 <script setup lang="ts">
 interface Props {
-  modelValue: string;
+  modelValue: string | number;
   label?: string;
   placeholder?: string;
   type?: string;
@@ -14,12 +14,17 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string): void;
+  (e: 'update:modelValue', value: string | number): void;
 }>();
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  emit('update:modelValue', target.value);
+  const val = target.value;
+  if (props.type === 'number') {
+    emit('update:modelValue', val === '' ? val : Number(val));
+  } else {
+    emit('update:modelValue', val);
+  }
 };
 </script>
 

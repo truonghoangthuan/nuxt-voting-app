@@ -8,34 +8,42 @@ import { useUserVotes } from '~/composables/useUserVotes';
 const route = useRoute();
 const router = useRouter();
 const { getPoll, vote, subscribe } = usePolls();
-const { hasVoted: checkHasVoted, markVoted, getVotedOption } = useUserVotes();
+const { getVoteCount, markVoted, hasVotedForOption } = useUserVotes();
 const { userName } = useUser();
 const pollId = route.params.id as string;
 
 const poll = ref<Poll | null>(null);
 const selectedOption = ref<string | null>(null);
-const hasVoted = ref(false);
+const userVoteCount = ref(0);
 const expandedOptionId = ref<string | null>(null);
+
+const maxVotes = computed(() => poll.value?.maxVotes || 1);
+const canVote = computed(() => userVoteCount.value < maxVotes.value);
+const isMaxVotesReached = computed(() => userVoteCount.value >= maxVotes.value);
 
 const pollRef = await getPoll(pollId);
 if (pollRef.value) {
   poll.value = pollRef.value;
-
-  // Check if user has already voted
-  const votedOptionId = getVotedOption(pollId);
-  if (votedOptionId) {
-    selectedOption.value = votedOptionId;
-    hasVoted.value = true;
-  }
+  userVoteCount.value = getVoteCount(pollId);
 }
 
 const handleVote = async () => {
-  if (selectedOption.value) {
+  if (selectedOption.value && canVote.value) {
     const { user } = useAuth();
-    await vote(pollId, selectedOption.value, userName.value, user.value?.uid);
+
+    // Optimistic update
     markVoted(pollId, selectedOption.value);
-    hasVoted.value = true;
+    userVoteCount.value++;
+
+    await vote(pollId, selectedOption.value, userName.value, user.value?.uid);
+
+    // Reset selection
+    selectedOption.value = null;
   }
+};
+
+const isOptionVoted = (optionId: string) => {
+  return hasVotedForOption(pollId, optionId);
 };
 
 let unsubscribe: (() => void) | undefined;
@@ -77,31 +85,74 @@ const getPercentage = (votes: number) => {
       </NeoCard>
     </div>
 
-    <NeoCard v-else :title="hasVoted ? 'Results' : 'Vote Now'" v-motion-slide-bottom show-share>
-      <h2 class="text-3xl font-black mb-8 leading-tight">{{ poll.question }}</h2>
+    <NeoCard v-else :title="isMaxVotesReached ? 'Results' : 'Vote Now'" v-motion-slide-bottom show-share>
+      <h2 class="text-3xl font-black mb-2 leading-tight">{{ poll.question }}</h2>
 
-      <div v-if="!hasVoted" class="flex flex-col gap-4">
+      <div
+        v-if="maxVotes > 1"
+        class="mb-6 bg-blue-50 border-2 border-blue-200 p-3 rounded text-blue-800 font-bold text-sm"
+      >
+        <span class="mr-2">ℹ️</span> You have {{ maxVotes - userVoteCount }} votes remaining (Total: {{ maxVotes }})
+      </div>
+      <div v-else class="mb-6"></div>
+
+      <div v-if="!isMaxVotesReached" class="flex flex-col gap-4">
         <button
           v-for="(option, index) in poll.options"
           :key="option.id"
           @click="selectedOption = option.id"
+          :disabled="isOptionVoted(option.id)"
           class="relative w-full p-4 border-3 border-neo-black text-left font-bold text-xl transition-all duration-200 group overflow-hidden"
-          :class="
+          :class="[
             selectedOption === option.id
               ? 'bg-neo-main shadow-none translate-x-[4px] translate-y-[4px]'
-              : 'bg-neo-white shadow-neo hover:-translate-y-1 hover:shadow-neo-lg'
-          "
+              : 'bg-neo-white shadow-neo hover:-translate-y-1 hover:shadow-neo-lg',
+            isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-gray-100' : '',
+          ]"
         >
           <div class="relative z-10 flex justify-between items-center">
             <span>{{ option.text }}</span>
-            <span v-if="selectedOption === option.id" v-motion-pop> Currently Selected </span>
+            <span v-if="selectedOption === option.id" v-motion-pop> Selected </span>
+            <span v-if="isOptionVoted(option.id)" class="text-sm bg-gray-200 px-2 py-1 border border-gray-400"
+              >VOTED</span
+            >
           </div>
         </button>
 
         <div class="mt-6 flex justify-end">
-          <NeoButton v-if="selectedOption" variant="black" @click="handleVote" v-motion-pop class="text-xl px-12">
-            VOTE
+          <NeoButton
+            v-if="selectedOption"
+            variant="black"
+            @click="handleVote"
+            v-motion-pop
+            class="text-xl px-12"
+            :disabled="!canVote"
+          >
+            VOTE ({{ userVoteCount }}/{{ maxVotes }})
           </NeoButton>
+        </div>
+
+        <!-- Show partial results or previously voted options if any -->
+        <div v-if="userVoteCount > 0" class="mt-8 border-t-2 border-gray-200 pt-4">
+          <h3 class="text-lg font-bold mb-4 uppercase text-gray-500">Current Results</h3>
+          <div class="flex flex-col gap-4">
+            <div
+              v-for="(option, index) in poll.options"
+              :key="option.id"
+              class="relative w-full border-2 border-gray-300 bg-gray-50"
+            >
+              <div class="p-3 relative z-10">
+                <div
+                  class="absolute top-0 left-0 bottom-0 bg-gray-200 transition-all duration-1000 ease-out"
+                  :style="{ width: `${getPercentage(option.votes)}%` }"
+                ></div>
+                <div class="relative z-10 flex justify-between font-bold text-md items-center text-gray-600">
+                  <span>{{ option.text }}</span>
+                  <span>{{ getPercentage(option.votes) }}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -123,6 +174,11 @@ const getPercentage = (votes: number) => {
               <span>{{ option.text }}</span>
               <div class="flex items-center gap-2">
                 <span>{{ getPercentage(option.votes) }}% ({{ option.votes }})</span>
+                <span
+                  v-if="isOptionVoted(option.id)"
+                  class="text-xs bg-neo-main px-2 py-1 border border-neo-black text-white"
+                  >YOU</span
+                >
                 <span
                   class="text-sm transition-transform duration-200"
                   :class="{ 'rotate-180': expandedOptionId === option.id }"
