@@ -3,12 +3,17 @@ interface Props {
   variant?: 'primary' | 'secondary' | 'accent' | 'danger' | 'white' | 'black';
   size?: 'sm' | 'md' | 'lg';
   block?: boolean;
+  loading?: boolean;
+  icon?: string;
+  disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'white',
   size: 'md',
   block: false,
+  loading: false,
+  disabled: false,
 });
 
 const variantClasses = {
@@ -29,9 +34,19 @@ const sizeClasses = {
 
 <template>
   <button
-    class="relative font-bold border-3 border-neo-black shadow-neo transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none mb-1 mr-1"
-    :class="[variantClasses[variant], sizeClasses[size], { 'w-full': block }]"
+    class="relative font-bold border-3 border-neo-black shadow-neo transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none mb-1 mr-1 flex items-center justify-center gap-2"
+    :class="[
+      variantClasses[variant],
+      sizeClasses[size],
+      { 'w-full': block, 'opacity-75 cursor-not-allowed': disabled || loading },
+    ]"
+    :disabled="disabled || loading"
   >
-    <slot />
+    <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-inherit">
+      <NeoLoader class="scale-[0.4]" />
+    </div>
+    <span :class="{ invisible: loading }">
+      <slot />
+    </span>
   </button>
 </template>

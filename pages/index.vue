@@ -71,8 +71,8 @@ const formatDate = (timestamp?: number) => {
     </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-black"></div>
+    <div v-if="loading" class="flex justify-center py-24">
+      <NeoLoader />
     </div>
 
     <!-- Empty State -->
