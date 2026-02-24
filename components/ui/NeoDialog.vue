@@ -31,7 +31,7 @@ const close = () => {
       <NeoCard :title="title">
         <slot />
         <div class="mt-6 flex justify-end">
-          <NeoButton variant="primary" @click="close">Got it!</NeoButton>
+          <NeoButton variant="danger" @click="close">Close</NeoButton>
         </div>
       </NeoCard>
     </div>

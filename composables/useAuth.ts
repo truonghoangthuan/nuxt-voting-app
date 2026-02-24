@@ -54,21 +54,37 @@ export const useAuth = () => {
     }
   };
 
-  const loginAsGuest = async (username: string) => {
+  const loginAsGuest = async (username?: string) => {
     loading.value = true;
     error.value = null;
     try {
       const userCredential = await signInAnonymously($auth as any);
-      await updateProfile(userCredential.user, {
-        displayName: username,
-      });
-      // Force update the reactive user state to reflect the new displayName
-      user.value = { ...userCredential.user } as User;
+      if (username) {
+        await updateProfile(userCredential.user, {
+          displayName: username,
+        });
+        // Force update the reactive user state to reflect the new displayName
+        user.value = { ...userCredential.user, displayName: username } as User;
+      } else {
+        user.value = userCredential.user as User;
+      }
     } catch (e: any) {
       error.value = e.message;
       throw e;
     } finally {
       loading.value = false;
+    }
+  };
+
+  const updateGuestUsername = async (username: string) => {
+    if (user.value) {
+      loading.value = true;
+      try {
+        await updateProfile(user.value, { displayName: username });
+        user.value = { ...user.value, displayName: username } as User;
+      } finally {
+        loading.value = false;
+      }
     }
   };
 
@@ -92,6 +108,7 @@ export const useAuth = () => {
     login,
     register,
     loginAsGuest,
+    updateGuestUsername,
     logout,
   };
 };

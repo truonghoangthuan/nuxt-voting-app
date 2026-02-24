@@ -3,9 +3,11 @@ import { useAuth } from '~/composables/useAuth';
 
 const email = ref('');
 const password = ref('');
-const guestUsername = ref('');
 const { login, loginAsGuest, error, loading } = useAuth();
 const router = useRouter();
+
+const showGuestDialog = ref(false);
+const guestNameInput = ref('');
 
 const handleLogin = async () => {
   if (!email.value || !password.value) return;
@@ -19,11 +21,16 @@ const handleLogin = async () => {
   }
 };
 
-const handleGuestLogin = async () => {
-  if (!guestUsername.value) return;
+const handleGuestLogin = () => {
+  showGuestDialog.value = true;
+};
+
+const submitGuestLogin = async () => {
+  if (!guestNameInput.value.trim()) return;
 
   try {
-    await loginAsGuest(guestUsername.value);
+    showGuestDialog.value = false;
+    await loginAsGuest(guestNameInput.value.trim());
     const redirectPath = (useRoute().query.redirect as string) || '/';
     router.push(redirectPath);
   } catch (e) {
@@ -71,20 +78,26 @@ const handleGuestLogin = async () => {
         <div class="flex-grow border-t-2 border-gray-200"></div>
       </div>
 
-      <form @submit.prevent="handleGuestLogin" class="space-y-6">
-        <NeoInput
-          v-model="guestUsername"
-          label="Guest Username"
-          type="text"
-          placeholder="Enter a username to join"
-          id="guestUsername"
-          required
-        />
-
-        <NeoButton type="submit" variant="secondary" :block="true" :disabled="loading" class="w-full">
-          {{ loading ? 'Loggin in...' : 'Continue as Guest' }}
-        </NeoButton>
-      </form>
+      <NeoButton
+        type="button"
+        @click="handleGuestLogin"
+        variant="secondary"
+        :block="true"
+        :disabled="loading"
+        class="w-full"
+      >
+        {{ loading ? 'Logging in...' : 'Continue as Guest' }}
+      </NeoButton>
     </NeoCard>
+
+    <NeoDialog v-model="showGuestDialog" title="Guest Login">
+      <div class="space-y-4">
+        <p>Please enter a username to join as a guest.</p>
+        <NeoInput v-model="guestNameInput" placeholder="Your name" @keyup.enter="submitGuestLogin" />
+        <NeoButton block variant="primary" @click="submitGuestLogin" :disabled="!guestNameInput.trim() || loading">
+          Continue
+        </NeoButton>
+      </div>
+    </NeoDialog>
   </div>
 </template>
