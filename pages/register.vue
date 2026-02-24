@@ -4,13 +4,14 @@ import { useAuth } from '~/composables/useAuth';
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const displayName = ref('');
 const { register, error, loading } = useAuth();
 const router = useRouter();
 const localError = ref<string | null>(null);
 
 const handleRegister = async () => {
   localError.value = null;
-  if (!email.value || !password.value) return;
+  if (!email.value || !password.value || !displayName.value) return;
 
   if (password.value !== confirmPassword.value) {
     localError.value = 'Passwords do not match';
@@ -18,7 +19,7 @@ const handleRegister = async () => {
   }
 
   try {
-    await register(email.value, password.value);
+    await register(email.value, password.value, displayName.value);
     router.push('/');
   } catch (e) {
     // Error is handled in composable state
@@ -32,6 +33,15 @@ const handleRegister = async () => {
       <h1 class="text-3xl font-black mb-8 text-center uppercase">Create Account</h1>
 
       <form @submit.prevent="handleRegister" class="space-y-6">
+        <NeoInput
+          v-model="displayName"
+          label="Display Name"
+          type="text"
+          placeholder="Enter your display name"
+          id="displayName"
+          required
+        />
+
         <NeoInput v-model="email" label="Email" type="email" placeholder="Enter your email" id="email" required />
 
         <NeoInput

@@ -41,11 +41,16 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string, displayName: string) => {
     loading.value = true;
     error.value = null;
     try {
-      await createUserWithEmailAndPassword($auth as any, email, password);
+      const userCredential = await createUserWithEmailAndPassword($auth as any, email, password);
+      await updateProfile(userCredential.user, {
+        displayName,
+      });
+      // Force update the reactive user state to reflect the new displayName
+      user.value = { ...userCredential.user, displayName } as User;
     } catch (e: any) {
       error.value = e.message;
       throw e;
