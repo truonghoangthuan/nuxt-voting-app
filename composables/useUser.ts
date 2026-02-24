@@ -2,6 +2,9 @@ export const useUser = () => {
   const { user } = useAuth();
 
   const userName = computed(() => {
+    if (user.value?.displayName) {
+      return user.value.displayName;
+    }
     if (user.value?.email) {
       return user.value.email.split('@')[0];
     }

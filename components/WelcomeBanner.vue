@@ -23,7 +23,7 @@ const handleLogout = async () => {
       class="bg-neo-accent border-3 border-neo-black p-3 shadow-neo transition-all duration-300 hover:scale-105 hover:bg-neo-main group cursor-help max-w-[calc(100vw-2rem)] sm:max-w-[200px]"
     >
       <div class="font-black text-xs uppercase tracking-wider mb-1 group-hover:text-neo-white">Welcome,</div>
-      <div class="font-black text-lg truncate group-hover:text-neo-white font-mono" :title="user?.email || userName">
+      <div class="font-black text-lg truncate group-hover:text-neo-white font-mono" :title="user?.email || displayName">
         {{ displayName }}
       </div>
 

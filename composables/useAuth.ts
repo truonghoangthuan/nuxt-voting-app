@@ -4,6 +4,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  signInAnonymously,
+  updateProfile,
   type User,
 } from 'firebase/auth';
 
@@ -52,6 +54,24 @@ export const useAuth = () => {
     }
   };
 
+  const loginAsGuest = async (username: string) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const userCredential = await signInAnonymously($auth as any);
+      await updateProfile(userCredential.user, {
+        displayName: username,
+      });
+      // Force update the reactive user state to reflect the new displayName
+      user.value = { ...userCredential.user } as User;
+    } catch (e: any) {
+      error.value = e.message;
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const logout = async () => {
     loading.value = true;
     error.value = null;
@@ -71,6 +91,7 @@ export const useAuth = () => {
     error,
     login,
     register,
+    loginAsGuest,
     logout,
   };
 };

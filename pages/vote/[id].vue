@@ -69,8 +69,8 @@ const handleVote = async () => {
 
       // Update participants list
       if (!poll.value.participants) poll.value.participants = [];
-      if (!poll.value.participants.includes(user.value.uid)) {
-        poll.value.participants.push(user.value.uid);
+      if (!poll.value.participants.includes(userId)) {
+        poll.value.participants.push(userId);
       }
     }
 

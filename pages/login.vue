@@ -3,7 +3,8 @@ import { useAuth } from '~/composables/useAuth';
 
 const email = ref('');
 const password = ref('');
-const { login, error, loading } = useAuth();
+const guestUsername = ref('');
+const { login, loginAsGuest, error, loading } = useAuth();
 const router = useRouter();
 
 const handleLogin = async () => {
@@ -11,6 +12,18 @@ const handleLogin = async () => {
 
   try {
     await login(email.value, password.value);
+    const redirectPath = (useRoute().query.redirect as string) || '/';
+    router.push(redirectPath);
+  } catch (e) {
+    // Error is handled in composable state
+  }
+};
+
+const handleGuestLogin = async () => {
+  if (!guestUsername.value) return;
+
+  try {
+    await loginAsGuest(guestUsername.value);
     const redirectPath = (useRoute().query.redirect as string) || '/';
     router.push(redirectPath);
   } catch (e) {
@@ -51,6 +64,27 @@ const handleLogin = async () => {
           <NuxtLink to="/register" class="font-bold text-neo-main hover:underline"> Create Account </NuxtLink>
         </p>
       </div>
+
+      <div class="relative py-6 flex items-center">
+        <div class="flex-grow border-t-2 border-gray-200"></div>
+        <span class="flex-shrink-0 mx-4 text-gray-400 font-bold uppercase tracking-wider text-sm">Or</span>
+        <div class="flex-grow border-t-2 border-gray-200"></div>
+      </div>
+
+      <form @submit.prevent="handleGuestLogin" class="space-y-6">
+        <NeoInput
+          v-model="guestUsername"
+          label="Guest Username"
+          type="text"
+          placeholder="Enter a username to join"
+          id="guestUsername"
+          required
+        />
+
+        <NeoButton type="submit" variant="secondary" :block="true" :disabled="loading" class="w-full">
+          {{ loading ? 'Loggin in...' : 'Continue as Guest' }}
+        </NeoButton>
+      </form>
     </NeoCard>
   </div>
 </template>
