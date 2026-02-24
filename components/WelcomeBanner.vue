@@ -5,6 +5,9 @@ const { user, logout } = useAuth();
 const router = useRouter();
 
 const displayName = computed(() => {
+  if (user.value?.displayName) {
+    return user.value.displayName;
+  }
   if (user.value?.email) {
     return user.value.email.split('@')[0];
   }
