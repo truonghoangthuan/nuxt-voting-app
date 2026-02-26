@@ -76,7 +76,15 @@ watch(maxVotes, () => {
 
         <div class="flex flex-col gap-2">
           <label class="font-bold text-lg uppercase">Max Votes per User</label>
-          <NeoInput v-model="maxVotes" type="number" min="1" :max="options.length" placeholder="1" class="w-32" />
+          <NeoInput
+            v-model="maxVotes"
+            type="number"
+            min="1"
+            :max="options.length"
+            placeholder="1"
+            class="w-32"
+            @keydown="(e: KeyboardEvent) => ['-', 'e', '+'].includes(e.key) && e.preventDefault()"
+          />
         </div>
 
         <div class="flex flex-col gap-4">

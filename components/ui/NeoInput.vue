@@ -5,6 +5,8 @@ interface Props {
   placeholder?: string;
   type?: string;
   id?: string;
+  min?: string | number;
+  max?: string | number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -35,6 +37,8 @@ const handleInput = (event: Event) => {
       :id="id"
       :type="type"
       :value="modelValue"
+      :min="min"
+      :max="max"
       @input="handleInput"
       :placeholder="placeholder"
       class="w-full bg-neo-white border-3 border-neo-black p-3 font-bold placeholder:text-gray-500 focus:outline-none focus:bg-neo-bg transition-colors shadow-neo-sm focus:shadow-neo"
