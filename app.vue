@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import './assets/css/main.css';
 import { useAuth } from '~/composables/useAuth';
+import { Analytics } from '@vercel/analytics/nuxt';
 
 const { user } = useAuth();
 const route = useRoute();
@@ -19,6 +20,6 @@ watch(user, (newUser) => {
   <div class="min-h-screen bg-neo-bg text-neo-text font-sans selection:bg-neo-main selection:text-black">
     <WelcomeBanner />
     <NuxtPage />
-    <Analytics/>
+    <Analytics />
   </div>
 </template>
