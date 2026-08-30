@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuxt Voting - Split Layout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #000000;
+      --text-muted: #666666;
+      --border: #eaeaea;
+    }
+    
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    @media (min-width: 1024px) {
+      .layout { flex-direction: row; }
+    }
+
+    .left-pane {
+      flex: 1;
+      padding: 60px 5vw;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: var(--bg);
+    }
+
+    .right-pane {
+      flex: 1;
+      background: #fafafa;
+    }
+
+    .logo {
+      font-weight: 600;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    h1 {
+      font-size: 56px;
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin: 0 0 24px 0;
+    }
+
+    p.subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 400px;
+      margin: 0 0 40px 0;
+    }
+
+    .btn {
+      background-color: var(--text);
+      color: var(--bg);
+      border: 1px solid var(--text);
+      padding: 16px 32px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      width: fit-content;
+    }
+
+    .btn:hover {
+      background-color: transparent;
+      color: var(--text);
+    }
+
+    .feature-card {
+      padding: 80px 5vw;
+      border-bottom: 1px solid var(--border);
+      background: #ffffff;
+    }
+
+    .meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    h3 {
+      font-size: 32px;
+      font-weight: 500;
+      margin: 0 0 16px 0;
+      letter-spacing: -0.03em;
+    }
+
+    .feature-card p {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Mockup UI in right pane */
+    .mockup {
+      margin-top: 48px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fff;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .mock-poll { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); }
+    .mock-poll:last-child { border-bottom: none; }
+    .mock-bar { height: 4px; background: var(--text); margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="left-pane">
+      <div class="logo">VotingApp.</div>
+      <div>
+        <h1>Collect votes.<br>Without the noise.</h1>
+        <p class="subtitle">A minimalist polling platform for teams. Create a poll in seconds, see results in real-time.</p>
+        <div style="display: flex; gap: 16px;">
+          <a href="#" class="btn">Start Polling</a>
+          <a href="#" class="btn" style="background: transparent; color: var(--text);">Log In</a>
+        </div>
+      </div>
+      <div class="meta" style="margin: 0;">© 2026. Swiss Light Mode.</div>
+    </div>
+    
+    <div class="right-pane">
+      <div class="feature-card">
+        <span class="meta">01 / CAPABILITY</span>
+        <h3>Real-time Results</h3>
+        <p>Powered by Server-Sent Events. The moment someone votes, your screen updates.</p>
+        
+        <div class="mockup">
+          <div style="font-weight: 500; margin-bottom: 24px;">Where should we host the offsite?</div>
+          <div class="mock-poll">
+            <div>Tokyo <span class="meta" style="display:inline; margin-left: 8px;">12 votes</span></div>
+            <div style="font-weight: 500;">40%</div>
+          </div>
+          <div class="mock-bar" style="width: 40%"></div>
+          
+          <div class="mock-poll" style="margin-top: 16px;">
+            <div>Berlin <span class="meta" style="display:inline; margin-left: 8px;">18 votes</span></div>
+            <div style="font-weight: 500;">60%</div>
+          </div>
+          <div class="mock-bar" style="width: 60%"></div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <span class="meta">02 / TRANSPARENCY</span>
+        <h3>Know who voted.</h3>
+        <p>No more anonymous cowardice. Every vote is tied to a name, creating an accountable decision-making process.</p>
+      </div>
+
+      <div class="feature-card">
+        <span class="meta">03 / PERFORMANCE</span>
+        <h3>Lightweight & Fast</h3>
+        <p>Built on Nuxt 3 and Nitro. No heavy client-side bundles, just pure speed and native browser APIs.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
