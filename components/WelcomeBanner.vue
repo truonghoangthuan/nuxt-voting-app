@@ -33,6 +33,9 @@ const handleLogout = async () => {
 
     <div class="flex gap-2">
       <template v-if="user">
+        <NuxtLink to="/history">
+          <NeoButton variant="black" size="sm">History</NeoButton>
+        </NuxtLink>
         <NeoButton variant="white" size="sm" @click="handleLogout">Logout</NeoButton>
       </template>
       <template v-else>
