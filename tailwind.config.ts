@@ -21,6 +21,11 @@ export default <Config>{
           hover: '#FAFAFA',
           black: '#000000',
           white: '#FFFFFF',
+          yellow: '#FFDE59',
+          cyan: '#00FFFF',
+          pink: '#FF007F',
+          green: '#00FF00',
+          orange: '#FF914D',
         },
       },
       fontFamily: {

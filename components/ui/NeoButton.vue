@@ -17,12 +17,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const variantClasses = {
-  primary: 'bg-black text-white hover:bg-gray-800',
-  secondary: 'bg-white text-black border border-gray-200 hover:bg-gray-50',
-  accent: 'bg-black text-white hover:bg-gray-800',
-  danger: 'bg-red-600 text-white hover:bg-red-700',
-  white: 'bg-white text-black border border-gray-200 hover:bg-gray-50',
-  black: 'bg-black text-white hover:bg-gray-800',
+  primary: 'bg-swiss-yellow text-swiss-black border-2 border-swiss-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]',
+  secondary: 'bg-white text-swiss-black border-2 border-swiss-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]',
+  accent: 'bg-swiss-pink text-swiss-black border-2 border-swiss-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]',
+  danger: 'bg-red-500 text-white border-2 border-swiss-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]',
+  white: 'bg-white text-swiss-black border-2 border-swiss-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]',
+  black: 'bg-swiss-black text-white border-2 border-swiss-black shadow-[4px_4px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]',
 };
 
 const sizeClasses = {
@@ -34,7 +34,7 @@ const sizeClasses = {
 
 <template>
   <button
-    class="relative font-medium transition-colors flex items-center justify-center gap-2 rounded-[4px]"
+    class="relative font-bold transition-all duration-200 ease-out flex items-center justify-center gap-2 rounded-none"
     :class="[
       variantClasses[variant],
       sizeClasses[size],

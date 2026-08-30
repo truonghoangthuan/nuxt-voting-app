@@ -26,9 +26,19 @@ watch(user, (newUser) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-swiss-bg text-swiss-text font-sans selection:bg-black selection:text-white">
-    <WelcomeBanner />
+  <div class="min-h-screen font-sans bg-swiss-bg text-swiss-text antialiased selection:bg-swiss-yellow selection:text-swiss-black">
+    <!-- User Name Dialog -->
+    <UserNameDialog />
+    
+    <!-- Welcome Banner (if needed) -->
+    <!-- <WelcomeBanner /> -->
+
+    <!-- Main Content -->
     <NuxtPage />
+
+    <!-- Toast Notifications -->
+    <NeoToast />
+    
     <Analytics />
   </div>
 </template>

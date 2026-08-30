@@ -18,7 +18,7 @@ const handleShare = () => {
 </script>
 
 <template>
-  <div class="bg-white border border-gray-200 p-8">
+  <div class="bg-white border-2 border-swiss-black shadow-[8px_8px_0px_rgba(0,0,0,1)] p-8 rounded-none">
     <div v-if="title" class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
       <h2 class="text-xl font-medium tracking-tight flex-grow">
         {{ title }}
@@ -26,7 +26,7 @@ const handleShare = () => {
       <button
         v-if="showShare"
         @click="handleShare"
-        class="flex items-center gap-2 px-3 py-1.5 font-medium text-xs bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors rounded-sm"
+        class="flex items-center gap-2 px-3 py-1.5 font-bold text-xs bg-swiss-cyan border-2 border-swiss-black text-swiss-black shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_rgba(0,0,0,1)] transition-all duration-200 rounded-none"
       >
         <span v-if="!copied">Share</span>
         <span v-else>Copied</span>

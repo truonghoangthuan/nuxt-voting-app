@@ -41,7 +41,7 @@ const handleInput = (event: Event) => {
       :max="max"
       @input="handleInput"
       :placeholder="placeholder"
-      class="w-full bg-white border border-gray-200 px-3 py-2 font-normal text-sm placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors rounded-[4px]"
+      class="w-full bg-white border-2 border-swiss-black px-3 py-2 font-medium text-sm placeholder:text-gray-400 focus:outline-none focus:shadow-[4px_4px_0px_rgba(0,0,0,1)] focus:-translate-x-[2px] focus:-translate-y-[2px] transition-all duration-200 rounded-none"
     />
   </div>
 </template>

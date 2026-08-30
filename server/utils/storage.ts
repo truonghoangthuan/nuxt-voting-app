@@ -18,6 +18,10 @@ export interface Poll {
   participants: string[]; // List of user IDs who have voted
   createdAt: number;
   maxVotes?: number;
+  status: 'active' | 'closed';
+  creatorId: string | null;
+  deadline?: number | null;
+  comments?: { id: string; text: string; author: string; createdAt: number }[];
 }
 
 // Store active SSE connections locally
@@ -43,7 +47,7 @@ export const usePollStorage = () => {
     return doc.exists ? (doc.data() as Poll) : null;
   };
 
-  const create = async (question: string, options: string[], maxVotes: number = 1) => {
+  const create = async (question: string, options: string[], maxVotes: number = 1, creatorId: string | null = null, deadline: number | null = null) => {
     const id = Math.random().toString(36).substring(2, 9);
     const poll: Poll = {
       id,
@@ -57,6 +61,10 @@ export const usePollStorage = () => {
       participants: [],
       createdAt: Date.now(),
       maxVotes,
+      status: 'active',
+      creatorId,
+      deadline,
+      comments: [],
     };
 
     await firestore.collection('polls').doc(id).set(poll);
@@ -140,6 +148,55 @@ export const usePollStorage = () => {
     }
   };
 
+  const addOption = async (pollId: string, optionText: string) => {
+    const pollRef = firestore.collection('polls').doc(pollId);
+    
+    try {
+      await firestore.runTransaction(async (t: Transaction) => {
+        const doc = await t.get(pollRef);
+        if (!doc.exists) throw new Error('Poll not found');
+        
+        const poll = doc.data() as Poll;
+        if (poll.status !== 'active') throw new Error('Poll is closed');
+        
+        const newOption: PollOption = {
+          id: Math.random().toString(36).substring(2, 9),
+          text: optionText,
+          votes: 0,
+          voters: [],
+          voterIds: [],
+        };
+        
+        const updatedOptions = [...poll.options, newOption];
+        t.update(pollRef, { options: updatedOptions });
+      });
+      return true;
+    } catch (e) {
+      console.error('Failed to add option', e);
+      return false;
+    }
+  };
+
+  const closePoll = async (pollId: string, userId: string) => {
+    const pollRef = firestore.collection('polls').doc(pollId);
+    
+    try {
+      await firestore.runTransaction(async (t: Transaction) => {
+        const doc = await t.get(pollRef);
+        if (!doc.exists) throw new Error('Poll not found');
+        
+        const poll = doc.data() as Poll;
+        if (poll.creatorId !== userId) throw new Error('Unauthorized');
+        
+        t.update(pollRef, { status: 'closed' });
+      });
+      return true;
+    } catch (e) {
+      console.error('Failed to close poll', e);
+      return false;
+    }
+  };
+
   // SSE Helpers
   const subscribe = async (pollId: string, event: H3Event) => {
     if (!clients[pollId]) {
@@ -194,5 +251,7 @@ export const usePollStorage = () => {
     create,
     vote,
     subscribe,
+    addOption,
+    closePoll,
   };
 };

@@ -17,10 +17,21 @@ const selectedOptions = ref<string[]>([]);
 const userVoteCount = ref(0);
 const expandedOptionId = ref<string | null>(null);
 
+const { user } = useAuth();
+const isCreator = computed(() => {
+  return poll.value?.creatorId && user.value?.uid && poll.value.creatorId === user.value.uid;
+});
+const isPollClosed = computed(() => {
+  if (!poll.value) return false;
+  if (poll.value.status === 'closed') return true;
+  if (poll.value.deadline && Date.now() > poll.value.deadline) return true;
+  return false;
+});
+
 const maxVotes = computed(() => poll.value?.maxVotes || 1);
 const remainingVotes = computed(() => maxVotes.value - userVoteCount.value);
 const canVote = computed(() => {
-  return selectedOptions.value.length > 0 && selectedOptions.value.length <= remainingVotes.value;
+  return !isPollClosed.value && selectedOptions.value.length > 0 && selectedOptions.value.length <= remainingVotes.value;
 });
 const isMaxVotesReached = computed(() => userVoteCount.value >= maxVotes.value);
 
@@ -46,7 +57,6 @@ const toggleOption = (optionId: string) => {
 
 const handleVote = async () => {
   if (selectedOptions.value.length > 0 && canVote.value) {
-    const { user } = useAuth();
     const currentOptionIds = [...selectedOptions.value];
 
     // Optimistic update: Update local poll state immediately
@@ -81,6 +91,51 @@ const handleVote = async () => {
 
     // Reset selection
     selectedOptions.value = [];
+  }
+};
+
+const isClosing = ref(false);
+const handleClosePoll = async () => {
+  if (confirm('Are you sure you want to close this poll? No more votes can be cast.')) {
+    isClosing.value = true;
+    try {
+      await useFetch(`/api/polls/${pollId}/close`, {
+        method: 'POST',
+        body: { userId: user.value?.uid },
+      });
+      // The SSE will update the poll state, but we can optimistically update
+      if (poll.value) poll.value.status = 'closed';
+      const { addToast } = useToast();
+      addToast('Poll closed successfully', 'success');
+    } catch (e) {
+      const { addToast } = useToast();
+      addToast('Failed to close poll', 'error');
+    } finally {
+      isClosing.value = false;
+    }
+  }
+};
+
+const newOptionText = ref('');
+const isAddingOption = ref(false);
+const showAddOption = ref(false);
+const handleAddOption = async () => {
+  if (!newOptionText.value.trim()) return;
+  isAddingOption.value = true;
+  try {
+    await useFetch(`/api/polls/${pollId}/options`, {
+      method: 'POST',
+      body: { optionText: newOptionText.value.trim() },
+    });
+    newOptionText.value = '';
+    showAddOption.value = false;
+    const { addToast } = useToast();
+    addToast('Option added successfully', 'success');
+  } catch (e) {
+    const { addToast } = useToast();
+    addToast('Failed to add option', 'error');
+  } finally {
+    isAddingOption.value = false;
   }
 };
 
@@ -133,30 +188,33 @@ const getPercentage = (votes: number) => {
       </NeoCard>
     </div>
 
-    <NeoCard v-else :title="isMaxVotesReached ? 'Results' : 'Vote Now'" show-share>
-      <h2 class="text-2xl font-normal mb-8 leading-relaxed tracking-tight text-black">{{ poll.question }}</h2>
+    <NeoCard v-else :title="isPollClosed ? 'Results (Closed)' : (isMaxVotesReached ? 'Results' : 'Vote Now')" show-share>
+      <div class="flex justify-between items-start mb-8 gap-4">
+        <h2 class="text-2xl font-bold leading-relaxed tracking-tight text-black">{{ poll.question }}</h2>
+        <NeoButton v-if="isCreator && !isPollClosed" variant="danger" size="sm" @click="handleClosePoll" :loading="isClosing">Close Poll</NeoButton>
+      </div>
 
       <div
-        v-if="maxVotes > 1"
-        class="mb-8 bg-gray-50 border border-gray-200 p-4 text-gray-600 font-medium text-sm flex items-center gap-2"
+        v-if="maxVotes > 1 && !isPollClosed"
+        class="mb-8 bg-swiss-yellow border-2 border-swiss-black p-4 text-swiss-black font-bold text-sm flex items-center gap-2 shadow-[2px_2px_0px_rgba(0,0,0,1)]"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         You have {{ remainingVotes }} votes remaining (Total: {{ maxVotes }})
       </div>
       <div v-else class="mb-8"></div>
 
-      <div v-if="!isMaxVotesReached" class="flex flex-col gap-3">
+      <div v-if="!isMaxVotesReached && !isPollClosed" class="flex flex-col gap-3">
         <button
           v-for="(option, index) in poll.options"
           :key="option.id"
           @click="toggleOption(option.id)"
           :disabled="isOptionVoted(option.id)"
-          class="relative w-full p-4 border text-left font-medium text-lg transition-all duration-200 group flex items-center gap-4"
+          class="relative w-full p-4 border-2 text-left font-bold text-lg transition-all duration-200 group flex items-center gap-4 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0px_rgba(0,0,0,1)]"
           :class="[
             selectedOptions.includes(option.id)
-              ? 'border-black bg-gray-50 shadow-sm'
-              : 'border-gray-200 bg-white hover:border-gray-400',
-            isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-gray-50' : '',
+              ? 'border-swiss-black bg-swiss-yellow'
+              : 'border-swiss-black bg-white',
+            isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-gray-100 hover:translate-x-0 hover:translate-y-0 hover:shadow-[2px_2px_0px_rgba(0,0,0,1)]' : '',
           ]"
         >
           <!-- Radio / Checkbox Indicator -->
@@ -178,12 +236,23 @@ const getPercentage = (votes: number) => {
           </div>
         </button>
 
-        <div class="mt-8 flex justify-end">
+        <div class="mt-8 flex justify-between items-center gap-4 border-t-2 border-swiss-black pt-8">
+          <div v-if="!showAddOption">
+            <button @click="showAddOption = true" class="text-swiss-black font-bold underline hover:text-swiss-pink transition-colors">
+              + Add an Option
+            </button>
+          </div>
+          <div v-else class="flex flex-grow gap-2">
+            <NeoInput v-model="newOptionText" placeholder="New option text" class="flex-grow" />
+            <NeoButton variant="primary" @click="handleAddOption" :loading="isAddingOption">Add</NeoButton>
+            <NeoButton variant="secondary" @click="showAddOption = false">Cancel</NeoButton>
+          </div>
+
           <NeoButton
             v-if="selectedOptions.length > 0"
             variant="black"
             @click="handleVote"
-            class="text-base px-8"
+            class="text-base px-8 ml-auto"
             :disabled="!canVote"
           >
             Submit Vote ({{ selectedOptions.length }})

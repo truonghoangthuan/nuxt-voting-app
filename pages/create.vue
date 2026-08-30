@@ -35,15 +35,26 @@ const handleFileUpload = (content: string) => {
   options.value = newOptions;
 };
 
+const deadlineHours = ref<number | null>(null);
+const { user } = useAuth();
+
 const handleCreate = async () => {
   const validOptions = options.value.filter((o) => o.trim());
   if (question.value.trim() && validOptions.length >= 2) {
-    const id = await createPoll(question.value, validOptions, parseInt(maxVotes.value.toString(), 10));
+    let deadlineTimestamp = null;
+    if (deadlineHours.value && deadlineHours.value > 0) {
+      deadlineTimestamp = Date.now() + deadlineHours.value * 3600 * 1000;
+    }
+    
+    const creatorId = user.value?.uid || null;
+
+    const id = await createPoll(question.value, validOptions, parseInt(maxVotes.value.toString(), 10), creatorId, deadlineTimestamp);
     if (id) {
       router.push(`/vote/${id}`);
     }
   } else {
-    alert('Please enter a question and at least 2 options!');
+    const { addToast } = useToast();
+    addToast('Please enter a question and at least 2 options!', 'error');
   }
 };
 
@@ -84,6 +95,17 @@ watch(maxVotes, () => {
             placeholder="1"
             class="w-32"
             @keydown="(e: KeyboardEvent) => ['-', 'e', '+'].includes(e.key) && e.preventDefault()"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-medium text-sm text-gray-700">Deadline (in hours from now) - Optional</label>
+          <NeoInput
+            v-model="deadlineHours"
+            type="number"
+            min="1"
+            placeholder="e.g. 24"
+            class="w-32"
           />
         </div>
 
