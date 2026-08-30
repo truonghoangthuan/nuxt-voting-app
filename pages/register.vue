@@ -28,9 +28,9 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4">
-    <NeoCard class="w-full max-w-md p-8">
-      <h1 class="text-3xl font-black mb-8 text-center uppercase">Create Account</h1>
+  <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+    <NeoCard class="w-full max-w-md p-10">
+      <h1 class="text-2xl font-medium mb-8 text-center tracking-tight text-black">Create Account</h1>
 
       <form @submit.prevent="handleRegister" class="space-y-6">
         <NeoInput
@@ -62,19 +62,19 @@ const handleRegister = async () => {
           required
         />
 
-        <div v-if="error || localError" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+        <div v-if="error || localError" class="bg-red-50 border border-red-200 text-red-600 p-3 text-sm rounded-sm" role="alert">
           <p>{{ error || localError }}</p>
         </div>
 
-        <NeoButton type="submit" variant="secondary" :block="true" :disabled="loading">
+        <NeoButton type="submit" variant="primary" :block="true" :disabled="loading">
           {{ loading ? 'Creating Account...' : 'Sign Up' }}
         </NeoButton>
       </form>
 
-      <div class="mt-6 text-center">
-        <p class="text-gray-600">
+      <div class="mt-6 text-center text-sm">
+        <p class="text-gray-500">
           Already have an account?
-          <NuxtLink to="/login" class="font-bold text-neo-main hover:underline"> Login </NuxtLink>
+          <NuxtLink to="/login" class="font-medium text-black hover:underline"> Login </NuxtLink>
         </p>
       </div>
     </NeoCard>

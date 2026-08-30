@@ -18,23 +18,23 @@ const handleShare = () => {
 </script>
 
 <template>
-  <div class="bg-neo-white border-3 border-neo-black shadow-neo-lg p-6">
-    <div v-if="title" class="flex justify-between items-center mb-4 border-b-3 border-neo-black pb-2">
-      <h2 class="text-2xl font-black uppercase tracking-wide flex-grow">
+  <div class="bg-white border border-gray-200 p-8">
+    <div v-if="title" class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+      <h2 class="text-xl font-medium tracking-tight flex-grow">
         {{ title }}
       </h2>
       <button
         v-if="showShare"
         @click="handleShare"
-        class="flex items-center gap-2 px-3 py-1 font-bold text-sm bg-neo-accent border-2 border-neo-black shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all active:bg-neo-main"
+        class="flex items-center gap-2 px-3 py-1.5 font-medium text-xs bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors rounded-sm"
       >
-        <span v-if="!copied">SHARE</span>
-        <span v-else>COPIED!</span>
+        <span v-if="!copied">Share</span>
+        <span v-else>Copied</span>
         <svg
           v-if="!copied"
           xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
+          width="14"
+          height="14"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

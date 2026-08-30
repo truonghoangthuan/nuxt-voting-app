@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voting App - Stripe Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F6F9FC;
+      --text: #425466;
+      --heading: #0A2540;
+      --primary: #635BFF;
+      --primary-hover: #0A2540;
+    }
+    
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 400px;
+      background: linear-gradient(135deg, #635BFF 0%, #00D4FF 100%);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 85%);
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 80px 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 60px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      margin: 0;
+      letter-spacing: -1px;
+    }
+
+    .btn {
+      background-color: white;
+      color: var(--primary);
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(50,50,93,.11), 0 1px 3px rgba(0,0,0,.08);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 7px 14px rgba(50,50,93,.1), 0 3px 6px rgba(0,0,0,.08);
+      color: var(--heading);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 32px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px -1px rgba(50,50,93,.25), 0 1px 3px -1px rgba(0,0,0,.3);
+      transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 13px 27px -5px rgba(50,50,93,.25), 0 8px 16px -8px rgba(0,0,0,.3);
+    }
+
+    .card-title {
+      font-size: 19px;
+      font-weight: 600;
+      margin: 0 0 24px 0;
+      line-height: 1.5;
+      color: var(--heading);
+    }
+
+    .card-meta {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .options {
+      color: #8898AA;
+    }
+
+    .votes {
+      color: var(--primary);
+      background: rgba(99, 91, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero-bg"></div>
+  <div class="container">
+    <header>
+      <h1>My Joined Polls</h1>
+      <button class="btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        New Poll
+      </button>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h3 class="card-title">Which features should we prioritize for Q4?</h3>
+        <div class="card-meta">
+          <span class="options">4 Options</span>
+          <span class="votes">156 Votes</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Where should we host our next company offsite?</h3>
+        <div class="card-meta">
+          <span class="options">3 Options</span>
+          <span class="votes">89 Votes</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Pick the new logo design</h3>
+        <div class="card-meta">
+          <span class="options">2 Options</span>
+          <span class="votes">210 Votes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

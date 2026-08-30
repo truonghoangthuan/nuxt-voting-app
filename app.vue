@@ -3,6 +3,15 @@ import './assets/css/main.css';
 import { useAuth } from '~/composables/useAuth';
 import { Analytics } from '@vercel/analytics/nuxt';
 
+useHead({
+  link: [
+    {
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap'
+    }
+  ]
+})
+
 const { user } = useAuth();
 const route = useRoute();
 const router = useRouter();
@@ -17,7 +26,7 @@ watch(user, (newUser) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-neo-bg text-neo-text font-sans selection:bg-neo-main selection:text-black">
+  <div class="min-h-screen bg-swiss-bg text-swiss-text font-sans selection:bg-black selection:text-white">
     <WelcomeBanner />
     <NuxtPage />
     <Analytics />

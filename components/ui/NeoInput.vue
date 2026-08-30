@@ -11,7 +11,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
-  placeholder: 'TYPE HERE...',
+  placeholder: 'Enter value',
   id: () => `neo-input-${Math.random().toString(36).substring(2, 9)}`,
 });
 
@@ -31,8 +31,8 @@ const handleInput = (event: Event) => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
-    <label v-if="label" :for="id" class="font-bold text-lg uppercase cursor-pointer">{{ label }}</label>
+  <div class="flex flex-col gap-1.5">
+    <label v-if="label" :for="id" class="font-medium text-sm text-gray-700 cursor-pointer">{{ label }}</label>
     <input
       :id="id"
       :type="type"
@@ -41,7 +41,7 @@ const handleInput = (event: Event) => {
       :max="max"
       @input="handleInput"
       :placeholder="placeholder"
-      class="w-full bg-neo-white border-3 border-neo-black p-3 font-bold placeholder:text-gray-500 focus:outline-none focus:bg-neo-bg transition-colors shadow-neo-sm focus:shadow-neo"
+      class="w-full bg-white border border-gray-200 px-3 py-2 font-normal text-sm placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors rounded-[4px]"
     />
   </div>
 </template>

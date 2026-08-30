@@ -65,17 +65,17 @@ watch(maxVotes, () => {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-2xl pt-20 px-4">
-    <div class="mb-6">
-      <NeoButton variant="secondary" @click="router.push('/')" icon="arrow-left"> Back to Home </NeoButton>
+  <div class="container mx-auto max-w-2xl pt-24 px-6 pb-20">
+    <div class="mb-12">
+      <NeoButton variant="secondary" @click="router.push('/')"> ← Back to Home </NeoButton>
     </div>
 
-    <NeoCard title="Create New Poll" v-motion-slide-bottom>
-      <div class="flex flex-col gap-6">
+    <NeoCard title="Create New Poll">
+      <div class="flex flex-col gap-8">
         <NeoInput v-model="question" label="Question" placeholder="What do you want to ask?" />
 
-        <div class="flex flex-col gap-2">
-          <label class="font-bold text-lg uppercase">Max Votes per User</label>
+        <div class="flex flex-col gap-1.5">
+          <label class="font-medium text-sm text-gray-700">Max Votes per User</label>
           <NeoInput
             v-model="maxVotes"
             type="number"
@@ -88,13 +88,11 @@ watch(maxVotes, () => {
         </div>
 
         <div class="flex flex-col gap-4">
-          <label class="font-bold text-lg uppercase">Options</label>
+          <label class="font-medium text-sm text-gray-700">Options</label>
           <div
             v-for="(option, index) in options"
             :key="index"
             class="flex items-center gap-2"
-            v-motion-slide-right
-            :delay="index * 100"
           >
             <div class="flex-grow">
               <NeoInput
@@ -103,18 +101,18 @@ watch(maxVotes, () => {
                 :placeholder="`Option ${index + 1}`"
               />
             </div>
-            <NeoButton v-if="options.length > 2" variant="danger" @click="removeOption(index)" class="mb-0 mr-0">
-              X
+            <NeoButton v-if="options.length > 2" variant="secondary" @click="removeOption(index)" class="mb-0 mr-0">
+              ✕
             </NeoButton>
           </div>
 
-          <div class="flex gap-4">
+          <div class="flex gap-4 mt-2">
             <NeoButton variant="secondary" @click="addOption" class="self-start">
               <div class="flex items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -131,7 +129,7 @@ watch(maxVotes, () => {
             </NeoButton>
             <NeoFileUpload @upload="handleFileUpload" />
             <button
-              class="flex items-center justify-center w-12 h-12 rounded-full border-3 border-neo-black bg-sky-200 text-neo-black hover:bg-sky-400 font-bold shadow-neo active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
+              class="flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 font-medium transition-colors"
               @click="showHelp = true"
               title="Upload Help"
               aria-label="Upload Help"
@@ -141,17 +139,17 @@ watch(maxVotes, () => {
           </div>
         </div>
 
-        <div class="border-t-3 border-neo-black my-2"></div>
+        <div class="border-t border-gray-200 my-4"></div>
 
-        <NeoButton block variant="primary" @click="handleCreate" class="text-xl py-4"> CREATE POLL </NeoButton>
+        <NeoButton block variant="primary" @click="handleCreate" class="text-base py-3"> Create Poll </NeoButton>
       </div>
     </NeoCard>
 
     <NeoDialog v-model="showHelp" title="Upload Options Format">
-      <div class="space-y-4">
+      <div class="space-y-4 text-sm text-gray-700 font-normal">
         <p>You can upload a text file (.txt or .csv) to automatically populate the poll options.</p>
-        <p class="font-bold">Supported format:</p>
-        <code class="block bg-gray-100 p-3 border-2 border-neo-black rounded-lg"> Option 1, Option 2, Option 3 </code>
+        <p class="font-medium text-black">Supported format:</p>
+        <code class="block bg-gray-50 p-3 border border-gray-200 font-mono text-black">Option 1, Option 2, Option 3</code>
         <p>Values should be separated by commas.</p>
       </div>
     </NeoDialog>

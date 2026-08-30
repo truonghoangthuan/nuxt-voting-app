@@ -21,27 +21,19 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="fixed top-4 right-4 z-40 flex flex-col items-end gap-2" v-motion-slide-top>
+  <div class="fixed top-4 right-4 z-40 flex flex-col items-end gap-2">
     <div
-      class="bg-neo-accent border-3 border-neo-black p-3 shadow-neo transition-all duration-300 hover:scale-105 hover:bg-neo-main group cursor-help max-w-[calc(100vw-2rem)] sm:max-w-[200px]"
+      class="bg-white border border-gray-200 px-4 py-2 hover:bg-gray-50 transition-colors cursor-help max-w-[calc(100vw-2rem)] sm:max-w-[200px] flex items-center justify-between gap-3 shadow-sm rounded-sm"
     >
-      <div class="font-black text-xs uppercase tracking-wider mb-1 group-hover:text-neo-white">Welcome,</div>
-      <div class="font-black text-lg truncate group-hover:text-neo-white font-mono" :title="user?.email || displayName">
+      <div class="text-xs text-gray-500 uppercase tracking-wider font-medium">User</div>
+      <div class="text-sm font-medium truncate font-mono text-black" :title="user?.email || displayName">
         {{ displayName }}
       </div>
-
-      <!-- Decorative elements -->
-      <div
-        class="absolute -top-2 -right-2 w-4 h-4 bg-neo-main border-2 border-neo-black rounded-full hidden group-hover:block animate-bounce"
-      ></div>
-      <div
-        class="absolute -bottom-2 -left-2 w-3 h-3 bg-neo-white border-2 border-neo-black rotate-45 hidden group-hover:block animate-spin"
-      ></div>
     </div>
 
     <div class="flex gap-2">
       <template v-if="user">
-        <NeoButton variant="danger" size="sm" @click="handleLogout">Logout</NeoButton>
+        <NeoButton variant="white" size="sm" @click="handleLogout">Logout</NeoButton>
       </template>
       <template v-else>
         <NuxtLink to="/login">

@@ -12,23 +12,20 @@ export default <Config>{
   theme: {
     extend: {
       colors: {
-        neo: {
-          bg: '#FDFD96', // Yellow pastel background
-          main: '#A3E635', // Lime green
-          accent: '#0EA5E9', // Sky blue
-          danger: '#F87171', // Red
-          text: '#171717', // Neutral 900
-          white: '#FFFFFF',
+        swiss: {
+          bg: '#FFFFFF',
+          card: '#FFFFFF',
+          text: '#000000',
+          muted: '#666666',
+          border: '#EAEAEA',
+          hover: '#FAFAFA',
           black: '#000000',
+          white: '#FFFFFF',
         },
       },
-      boxShadow: {
-        neo: '4px 4px 0px 0px rgba(0,0,0,1)',
-        'neo-sm': '2px 2px 0px 0px rgba(0,0,0,1)',
-        'neo-lg': '8px 8px 0px 0px rgba(0,0,0,1)',
-      },
-      borderWidth: {
-        '3': '3px',
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
     },
   },
