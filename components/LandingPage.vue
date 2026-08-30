@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import { useAuth } from '~/composables/useAuth';
+
 const router = useRouter();
+const { user, logout } = useAuth();
 </script>
 
 <template>
@@ -20,9 +23,19 @@ const router = useRouter();
           <NuxtLink to="/create" class="inline-flex items-center justify-center px-8 py-4 bg-swiss-black text-swiss-white font-medium hover:bg-transparent hover:text-swiss-black border border-swiss-black transition-colors duration-200">
             Start Polling
           </NuxtLink>
-          <NuxtLink to="/login" class="inline-flex items-center justify-center px-8 py-4 bg-transparent text-swiss-black font-medium hover:bg-swiss-black hover:text-swiss-white border border-transparent hover:border-swiss-black transition-colors duration-200">
-            Log In
-          </NuxtLink>
+          <template v-if="!user">
+            <NuxtLink to="/login" class="inline-flex items-center justify-center px-8 py-4 bg-transparent text-swiss-black font-medium hover:bg-swiss-black hover:text-swiss-white border border-transparent hover:border-swiss-black transition-colors duration-200">
+              Log In
+            </NuxtLink>
+          </template>
+          <template v-else>
+            <NuxtLink to="/history" class="inline-flex items-center justify-center px-8 py-4 bg-transparent text-swiss-black font-medium hover:bg-swiss-black hover:text-swiss-white border border-transparent hover:border-swiss-black transition-colors duration-200">
+              History
+            </NuxtLink>
+            <button @click="logout" class="inline-flex items-center justify-center px-8 py-4 bg-transparent text-swiss-black font-medium hover:bg-swiss-black hover:text-swiss-white border border-transparent hover:border-swiss-black transition-colors duration-200">
+              Log Out
+            </button>
+          </template>
         </div>
       </div>
       
