@@ -48,7 +48,7 @@ const { user, logout } = useAuth();
     <div class="flex-1 bg-swiss-hover flex flex-col">
       <!-- Feature 1 -->
       <div class="px-12 lg:px-16 py-24 border-b border-swiss-border bg-swiss-bg">
-        <span class="font-mono text-xs text-swiss-muted uppercase block mb-4">01 / CAPABILITY</span>
+        <span class="font-mono text-xs text-swiss-cyan uppercase block mb-4">01 / CAPABILITY</span>
         <h3 class="text-3xl font-medium tracking-tight mb-4">Real-time Results</h3>
         <p class="text-lg text-swiss-muted leading-relaxed">
           Powered by Server-Sent Events. The moment someone votes, your screen updates.
@@ -69,15 +69,15 @@ const { user, logout } = useAuth();
             <div class="flex items-center">
               Berlin <span class="font-mono text-xs text-swiss-muted ml-3">18 votes</span>
             </div>
-            <div class="font-medium">60%</div>
+            <div class="font-medium text-swiss-cyan">60%</div>
           </div>
-          <div class="h-1 bg-swiss-black mt-2 w-[60%]"></div>
+          <div class="h-1 bg-swiss-cyan mt-2 w-[60%]"></div>
         </div>
       </div>
 
       <!-- Feature 2 -->
       <div class="px-12 lg:px-16 py-24 border-b border-swiss-border bg-swiss-bg">
-        <span class="font-mono text-xs text-swiss-muted uppercase block mb-4">02 / TRANSPARENCY</span>
+        <span class="font-mono text-xs text-swiss-cyan uppercase block mb-4">02 / TRANSPARENCY</span>
         <h3 class="text-3xl font-medium tracking-tight mb-4">Know who voted.</h3>
         <p class="text-lg text-swiss-muted leading-relaxed">
           No more anonymous cowardice. Every vote is tied to a name, creating an accountable decision-making process.
@@ -86,7 +86,7 @@ const { user, logout } = useAuth();
 
       <!-- Feature 3 -->
       <div class="px-12 lg:px-16 py-24 border-b border-swiss-border bg-swiss-bg">
-        <span class="font-mono text-xs text-swiss-muted uppercase block mb-4">03 / PERFORMANCE</span>
+        <span class="font-mono text-xs text-swiss-cyan uppercase block mb-4">03 / PERFORMANCE</span>
         <h3 class="text-3xl font-medium tracking-tight mb-4">Lightweight & Fast</h3>
         <p class="text-lg text-swiss-muted leading-relaxed">
           Built on Nuxt 3 and Nitro. No heavy client-side bundles, just pure speed and native browser APIs.
