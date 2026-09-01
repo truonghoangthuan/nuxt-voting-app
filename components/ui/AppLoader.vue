@@ -3,7 +3,7 @@
     <div
       v-for="(color, index) in colors"
       :key="index"
-      class="w-2 h-2 rounded-full animate-pulse"
+      class="w-2 h-2 rounded-none animate-pulse"
       :class="color"
       :style="{ animationDelay: `${index * 150}ms` }"
     ></div>

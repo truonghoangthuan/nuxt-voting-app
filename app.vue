@@ -26,7 +26,7 @@ watch(user, (newUser) => {
 </script>
 
 <template>
-  <div class="min-h-screen font-sans bg-swiss-bg text-swiss-text antialiased selection:bg-swiss-yellow selection:text-swiss-black">
+  <div class="min-h-screen font-sans bg-white text-black antialiased selection:bg-gray-200 selection:text-black">
     <!-- User Name Dialog -->
     <UserNameDialog />
     
@@ -37,7 +37,7 @@ watch(user, (newUser) => {
     <NuxtPage />
 
     <!-- Toast Notifications -->
-    <NeoToast />
+    <AppToast />
     
     <Analytics />
   </div>

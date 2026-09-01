@@ -41,13 +41,13 @@ const submitGuestLogin = async () => {
 
 <template>
   <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-    <NeoCard class="w-full max-w-md p-10">
+    <AppCard class="w-full max-w-md p-10">
       <h1 class="text-2xl font-medium mb-8 text-center tracking-tight text-black">Login</h1>
 
       <form @submit.prevent="handleLogin" class="space-y-6">
-        <NeoInput v-model="email" label="Email" type="email" placeholder="Enter your email" id="email" required />
+        <AppInput v-model="email" label="Email" type="email" placeholder="Enter your email" id="email" required />
 
-        <NeoInput
+        <AppInput
           v-model="password"
           label="Password"
           type="password"
@@ -56,13 +56,13 @@ const submitGuestLogin = async () => {
           required
         />
 
-        <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 p-3 text-sm rounded-sm" role="alert">
+        <div v-if="error" class="bg-red-50 border border-red-200 text-red-600 p-3 text-sm rounded-none" role="alert">
           <p>{{ error }}</p>
         </div>
 
-        <NeoButton type="submit" variant="primary" :block="true" :disabled="loading">
+        <AppButton type="submit" variant="primary" :block="true" :disabled="loading">
           {{ loading ? 'Logging in...' : 'Login' }}
-        </NeoButton>
+        </AppButton>
       </form>
 
       <div class="mt-6 text-center text-sm">
@@ -73,12 +73,12 @@ const submitGuestLogin = async () => {
       </div>
 
       <div class="relative py-8 flex items-center">
-        <div class="flex-grow border-t border-gray-200"></div>
+        <div class="flex-grow border-t border-[#eaeaea]"></div>
         <span class="flex-shrink-0 mx-4 text-gray-400 text-xs font-mono">OR</span>
-        <div class="flex-grow border-t border-gray-200"></div>
+        <div class="flex-grow border-t border-[#eaeaea]"></div>
       </div>
 
-      <NeoButton
+      <AppButton
         type="button"
         @click="handleGuestLogin"
         variant="secondary"
@@ -87,17 +87,17 @@ const submitGuestLogin = async () => {
         class="w-full"
       >
         {{ loading ? 'Logging in...' : 'Continue as Guest' }}
-      </NeoButton>
-    </NeoCard>
+      </AppButton>
+    </AppCard>
 
-    <NeoDialog v-model="showGuestDialog" title="Guest Login">
+    <AppDialog v-model="showGuestDialog" title="Guest Login">
       <div class="space-y-6">
         <p class="text-sm text-gray-600">Please enter a username to join as a guest.</p>
-        <NeoInput v-model="guestNameInput" placeholder="Your name" @keyup.enter="submitGuestLogin" />
-        <NeoButton block variant="primary" @click="submitGuestLogin" :disabled="!guestNameInput.trim() || loading">
+        <AppInput v-model="guestNameInput" placeholder="Your name" @keyup.enter="submitGuestLogin" />
+        <AppButton block variant="primary" @click="submitGuestLogin" :disabled="!guestNameInput.trim() || loading">
           Continue
-        </NeoButton>
+        </AppButton>
       </div>
-    </NeoDialog>
+    </AppDialog>
   </div>
 </template>

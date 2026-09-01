@@ -4,9 +4,9 @@ import { useToast } from '~/composables/useToast';
 const { toasts, removeToast } = useToast();
 
 const typeClasses = {
-  success: 'bg-swiss-green text-swiss-black',
-  error: 'bg-swiss-pink text-swiss-black',
-  info: 'bg-swiss-cyan text-swiss-black',
+  success: 'bg-white text-black border-l-4 border-swiss-green',
+  error: 'bg-white text-black border-l-4 border-red-500',
+  info: 'bg-white text-black border-l-4 border-swiss-cyan',
 };
 </script>
 
@@ -16,11 +16,11 @@ const typeClasses = {
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="border-2 border-swiss-black px-4 py-3 shadow-[4px_4px_0px_rgba(0,0,0,1)] font-bold flex items-center justify-between gap-4 w-72"
+        class="border border-[#eaeaea] px-4 py-3 font-medium flex items-center justify-between gap-4 w-72 bg-white"
         :class="typeClasses[toast.type]"
       >
-        <span class="text-sm">{{ toast.message }}</span>
-        <button @click="removeToast(toast.id)" class="hover:text-white transition-colors">
+        <span class="text-sm text-black">{{ toast.message }}</span>
+        <button @click="removeToast(toast.id)" class="text-gray-400 hover:text-black transition-colors">
           ✕
         </button>
       </div>

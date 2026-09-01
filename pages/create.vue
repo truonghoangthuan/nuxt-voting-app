@@ -78,16 +78,16 @@ watch(maxVotes, () => {
 <template>
   <div class="container mx-auto max-w-2xl pt-24 px-6 pb-20">
     <div class="mb-12">
-      <NeoButton variant="secondary" @click="router.push('/')"> ← Back to Home </NeoButton>
+      <AppButton variant="secondary" @click="router.push('/')"> ← Back to Home </AppButton>
     </div>
 
-    <NeoCard title="Create New Poll">
+    <AppCard title="Create New Poll">
       <div class="flex flex-col gap-8">
-        <NeoInput v-model="question" label="Question" placeholder="What do you want to ask?" />
+        <AppInput v-model="question" label="Question" placeholder="What do you want to ask?" />
 
         <div class="flex flex-col gap-1.5">
           <label class="font-medium text-sm text-gray-700">Max Votes per User</label>
-          <NeoInput
+          <AppInput
             v-model="maxVotes"
             type="number"
             min="1"
@@ -100,7 +100,7 @@ watch(maxVotes, () => {
 
         <div class="flex flex-col gap-1.5">
           <label class="font-medium text-sm text-gray-700">Deadline (in hours from now) - Optional</label>
-          <NeoInput
+          <AppInput
             v-model="deadlineHours"
             type="number"
             min="1"
@@ -117,19 +117,19 @@ watch(maxVotes, () => {
             class="flex items-center gap-2"
           >
             <div class="flex-grow">
-              <NeoInput
+              <AppInput
                 :model-value="options[index] as string"
                 @update:model-value="options[index] = $event as string"
                 :placeholder="`Option ${index + 1}`"
               />
             </div>
-            <NeoButton v-if="options.length > 2" variant="secondary" @click="removeOption(index)" class="mb-0 mr-0">
+            <AppButton v-if="options.length > 2" variant="secondary" @click="removeOption(index)" class="mb-0 mr-0">
               ✕
-            </NeoButton>
+            </AppButton>
           </div>
 
           <div class="flex gap-4 mt-2">
-            <NeoButton variant="secondary" @click="addOption" class="self-start">
+            <AppButton variant="secondary" @click="addOption" class="self-start">
               <div class="flex items-center gap-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -148,10 +148,10 @@ watch(maxVotes, () => {
                 </svg>
                 <span>Add Option</span>
               </div>
-            </NeoButton>
-            <NeoFileUpload @upload="handleFileUpload" />
+            </AppButton>
+            <AppFileUpload @upload="handleFileUpload" />
             <button
-              class="flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 font-medium transition-colors"
+              class="flex items-center justify-center w-9 h-9 rounded-none border border-[#eaeaea] bg-white text-gray-600 hover:bg-gray-50 font-medium transition-colors"
               @click="showHelp = true"
               title="Upload Help"
               aria-label="Upload Help"
@@ -161,19 +161,19 @@ watch(maxVotes, () => {
           </div>
         </div>
 
-        <div class="border-t border-gray-200 my-4"></div>
+        <div class="border-t border-[#eaeaea] my-4"></div>
 
-        <NeoButton block variant="primary" @click="handleCreate" class="text-base py-3"> Create Poll </NeoButton>
+        <AppButton block variant="primary" @click="handleCreate" class="text-base py-3"> Create Poll </AppButton>
       </div>
-    </NeoCard>
+    </AppCard>
 
-    <NeoDialog v-model="showHelp" title="Upload Options Format">
+    <AppDialog v-model="showHelp" title="Upload Options Format">
       <div class="space-y-4 text-sm text-gray-700 font-normal">
         <p>You can upload a text file (.txt or .csv) to automatically populate the poll options.</p>
         <p class="font-medium text-black">Supported format:</p>
-        <code class="block bg-gray-50 p-3 border border-gray-200 font-mono text-black">Option 1, Option 2, Option 3</code>
+        <code class="block bg-gray-50 p-3 border border-[#eaeaea] font-mono text-black">Option 1, Option 2, Option 3</code>
         <p>Values should be separated by commas.</p>
       </div>
-    </NeoDialog>
+    </AppDialog>
   </div>
 </template>

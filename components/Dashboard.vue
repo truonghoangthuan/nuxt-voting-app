@@ -53,29 +53,29 @@ const goToCreate = async () => {
 
 <template>
   <div class="container mx-auto max-w-4xl pt-24 px-6 pb-20">
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-gray-200 pb-6">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-[#eaeaea] pb-6">
       <h1 class="text-2xl font-medium tracking-tight text-black">My Joined Polls</h1>
-      <NeoButton variant="primary" @click="goToCreate" :loading="isCreating" class="mt-4 md:mt-0"> Create New Poll </NeoButton>
+      <AppButton variant="primary" @click="goToCreate" :loading="isCreating" class="mt-4 md:mt-0"> Create New Poll </AppButton>
     </header>
 
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-24">
-      <NeoLoader />
+      <AppLoader />
     </div>
 
     <!-- Empty State -->
     <div v-else-if="joinedPolls.length === 0">
-      <div class="text-center py-24 border border-dashed border-gray-300 rounded-sm">
+      <div class="text-center py-24 border border-dashed border-[#eaeaea] rounded-none">
         <h2 class="text-lg font-medium mb-2 text-black">No polls joined yet</h2>
         <p class="text-gray-500 mb-8 max-w-md mx-auto text-sm">
           You haven't participated in any polls yet. Why not create one or join existing ones?
         </p>
-        <NeoButton variant="secondary" @click="goToCreate" :loading="isCreating"> Create Your First Poll </NeoButton>
+        <AppButton variant="secondary" @click="goToCreate" :loading="isCreating"> Create Your First Poll </AppButton>
       </div>
     </div>
 
     <!-- Polls Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-gray-200 border border-gray-200">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-[#eaeaea] border border-[#eaeaea]">
       <div
         v-for="(poll, index) in joinedPolls"
         :key="poll.id"

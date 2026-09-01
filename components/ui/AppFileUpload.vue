@@ -31,7 +31,7 @@ const handleFileChange = (event: Event) => {
 <template>
   <div>
     <input ref="fileInput" type="file" accept=".txt,.csv" class="hidden" @change="handleFileChange" />
-    <NeoButton variant="secondary" @click="triggerUpload">
+    <AppButton variant="secondary" @click="triggerUpload">
       <div class="flex items-center gap-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -50,6 +50,6 @@ const handleFileChange = (event: Event) => {
         </svg>
         <span>Upload Options</span>
       </div>
-    </NeoButton>
+    </AppButton>
   </div>
 </template>

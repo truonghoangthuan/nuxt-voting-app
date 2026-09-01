@@ -29,11 +29,11 @@ const handleRegister = async () => {
 
 <template>
   <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-    <NeoCard class="w-full max-w-md p-10">
+    <AppCard class="w-full max-w-md p-10">
       <h1 class="text-2xl font-medium mb-8 text-center tracking-tight text-black">Create Account</h1>
 
       <form @submit.prevent="handleRegister" class="space-y-6">
-        <NeoInput
+        <AppInput
           v-model="displayName"
           label="Display Name"
           type="text"
@@ -42,9 +42,9 @@ const handleRegister = async () => {
           required
         />
 
-        <NeoInput v-model="email" label="Email" type="email" placeholder="Enter your email" id="email" required />
+        <AppInput v-model="email" label="Email" type="email" placeholder="Enter your email" id="email" required />
 
-        <NeoInput
+        <AppInput
           v-model="password"
           label="Password"
           type="password"
@@ -53,7 +53,7 @@ const handleRegister = async () => {
           required
         />
 
-        <NeoInput
+        <AppInput
           v-model="confirmPassword"
           label="Confirm Password"
           type="password"
@@ -62,13 +62,13 @@ const handleRegister = async () => {
           required
         />
 
-        <div v-if="error || localError" class="bg-red-50 border border-red-200 text-red-600 p-3 text-sm rounded-sm" role="alert">
+        <div v-if="error || localError" class="bg-red-50 border border-red-200 text-red-600 p-3 text-sm rounded-none" role="alert">
           <p>{{ error || localError }}</p>
         </div>
 
-        <NeoButton type="submit" variant="primary" :block="true" :disabled="loading">
+        <AppButton type="submit" variant="primary" :block="true" :disabled="loading">
           {{ loading ? 'Creating Account...' : 'Sign Up' }}
-        </NeoButton>
+        </AppButton>
       </form>
 
       <div class="mt-6 text-center text-sm">
@@ -77,6 +77,6 @@ const handleRegister = async () => {
           <NuxtLink to="/login" class="font-medium text-black hover:underline"> Login </NuxtLink>
         </p>
       </div>
-    </NeoCard>
+    </AppCard>
   </div>
 </template>

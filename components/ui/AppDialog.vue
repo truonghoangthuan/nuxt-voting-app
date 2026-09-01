@@ -28,12 +28,12 @@ const close = () => {
 
     <!-- Dialog Content -->
     <div class="relative z-10 w-full max-w-lg" v-motion-pop>
-      <NeoCard :title="title">
+      <AppCard :title="title">
         <slot />
         <div class="mt-6 flex justify-end">
-          <NeoButton variant="secondary" @click="close">Close</NeoButton>
+          <AppButton variant="secondary" @click="close">Close</AppButton>
         </div>
-      </NeoCard>
+      </AppCard>
     </div>
   </div>
 </template>
