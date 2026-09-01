@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Dark</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;500;600&family=Inter:wght@400;500&display=swap');
+        
+        :root {
+            /* Claude dark mode is warm dark, not pure black or blue */
+            --bg: #1B1A19;
+            --card-bg: #22211F;
+            --text-main: #EFECE6;
+            --text-muted: #9E9A92;
+            --accent: #E07D5D; 
+            --border: #35332F;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .logo {
+            font-family: 'Newsreader', serif;
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-family: 'Newsreader', serif;
+            font-size: 48px;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+        }
+        
+        p.subtitle {
+            font-size: 16px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 16px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        button.primary {
+            background-color: var(--text-main);
+            color: var(--bg);
+            border: none;
+        }
+        
+        button.secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        
+        .poll-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        
+        .poll-title {
+            font-weight: 500;
+            font-size: 18px;
+            margin-bottom: 32px;
+            color: var(--text-main);
+        }
+        
+        .option {
+            margin-bottom: 20px;
+        }
+        
+        .option-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .option-bg {
+            height: 32px;
+            background-color: var(--bg);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        
+        .option-fill {
+            height: 100%;
+            background-color: var(--accent);
+            opacity: 0.9;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <div class="logo">VotingApp.</div>
+            <h1>Collect votes.<br>Without the noise.</h1>
+            <p class="subtitle">A minimalist polling platform for teams. Create a poll in seconds, see results in real-time.</p>
+            <div class="actions">
+                <button class="primary">Start Polling</button>
+                <button class="secondary">Log In</button>
+            </div>
+        </div>
+        
+        <div class="poll-card">
+            <div class="poll-title">Where should we host the offsite?</div>
+            
+            <div class="option">
+                <div class="option-header">
+                    <span>Berlin</span>
+                    <span style="color:var(--text-muted)">18 votes (60%)</span>
+                </div>
+                <div class="option-bg">
+                    <div class="option-fill" style="width: 60%"></div>
+                </div>
+            </div>
+            
+            <div class="option">
+                <div class="option-header">
+                    <span>Tokyo</span>
+                    <span style="color:var(--text-muted)">12 votes (40%)</span>
+                </div>
+                <div class="option-bg">
+                    <div class="option-fill" style="width: 40%; background-color: var(--text-muted); opacity: 0.3;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

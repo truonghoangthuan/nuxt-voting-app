@@ -12,24 +12,19 @@ export default <Config>{
   theme: {
     extend: {
       colors: {
-        swiss: {
-          bg: '#FFFFFF',
+        claude: {
+          bg: '#F8F7F4',
           card: '#FFFFFF',
-          text: '#000000',
-          muted: '#666666',
-          border: '#EAEAEA',
-          hover: '#FAFAFA',
-          black: '#000000',
-          white: '#FFFFFF',
-          yellow: '#FFDE59',
-          cyan: '#00FFFF',
-          pink: '#FF007F',
-          green: '#00FF00',
-          orange: '#FF914D',
+          text: '#1D1C1B',
+          muted: '#6B6861',
+          border: '#E8E5E1',
+          hover: '#F2EFEA',
+          accent: '#D97757',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
     },

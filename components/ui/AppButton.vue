@@ -17,12 +17,12 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const variantClasses = {
-  primary: 'bg-swiss-yellow text-black border border-[#eaeaea] hover:bg-yellow-300',
-  secondary: 'bg-white text-black border border-[#eaeaea] hover:bg-gray-50',
-  accent: 'bg-swiss-cyan text-black border border-[#eaeaea] hover:bg-cyan-300',
-  danger: 'bg-red-500 text-white border border-red-600 hover:bg-red-600',
-  white: 'bg-white text-black border border-[#eaeaea] hover:bg-gray-50',
-  black: 'bg-black text-white border border-black hover:bg-gray-800',
+  primary: 'bg-claude-text text-claude-bg border-transparent hover:bg-black',
+  secondary: 'bg-transparent text-claude-text border-claude-border hover:bg-claude-card',
+  accent: 'bg-claude-accent text-white border-transparent hover:brightness-110',
+  danger: 'bg-red-500 text-white border-transparent hover:bg-red-600',
+  white: 'bg-white text-claude-text border-claude-border hover:bg-gray-50',
+  black: 'bg-claude-text text-claude-bg border-transparent hover:bg-black',
 };
 
 const sizeClasses = {
@@ -34,7 +34,7 @@ const sizeClasses = {
 
 <template>
   <button
-    class="relative font-medium transition-colors duration-200 flex items-center justify-center gap-2 rounded-none"
+    class="relative font-medium transition-all duration-200 flex items-center justify-center gap-2 rounded-lg border"
     :class="[
       variantClasses[variant],
       sizeClasses[size],

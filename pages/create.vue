@@ -86,7 +86,7 @@ watch(maxVotes, () => {
         <AppInput v-model="question" label="Question" placeholder="What do you want to ask?" />
 
         <div class="flex flex-col gap-1.5">
-          <label class="font-medium text-sm text-gray-700">Max Votes per User</label>
+          <label class="font-medium text-sm text-claude-text">Max Votes per User</label>
           <AppInput
             v-model="maxVotes"
             type="number"
@@ -99,7 +99,7 @@ watch(maxVotes, () => {
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="font-medium text-sm text-gray-700">Deadline (in hours from now) - Optional</label>
+          <label class="font-medium text-sm text-claude-text">Deadline (in hours from now) - Optional</label>
           <AppInput
             v-model="deadlineHours"
             type="number"
@@ -110,7 +110,7 @@ watch(maxVotes, () => {
         </div>
 
         <div class="flex flex-col gap-4">
-          <label class="font-medium text-sm text-gray-700">Options</label>
+          <label class="font-medium text-sm text-claude-text">Options</label>
           <div
             v-for="(option, index) in options"
             :key="index"
@@ -151,7 +151,7 @@ watch(maxVotes, () => {
             </AppButton>
             <AppFileUpload @upload="handleFileUpload" />
             <button
-              class="flex items-center justify-center w-9 h-9 rounded-none border border-[#eaeaea] bg-white text-gray-600 hover:bg-gray-50 font-medium transition-colors"
+              class="flex items-center justify-center w-9 h-9 rounded-lg border border-claude-border bg-claude-card text-claude-muted hover:bg-claude-bg font-medium transition-colors"
               @click="showHelp = true"
               title="Upload Help"
               aria-label="Upload Help"
@@ -161,17 +161,17 @@ watch(maxVotes, () => {
           </div>
         </div>
 
-        <div class="border-t border-[#eaeaea] my-4"></div>
+        <div class="border-t border-claude-border my-4"></div>
 
         <AppButton block variant="primary" @click="handleCreate" class="text-base py-3"> Create Poll </AppButton>
       </div>
     </AppCard>
 
     <AppDialog v-model="showHelp" title="Upload Options Format">
-      <div class="space-y-4 text-sm text-gray-700 font-normal">
+      <div class="space-y-4 text-sm text-claude-text font-normal">
         <p>You can upload a text file (.txt or .csv) to automatically populate the poll options.</p>
-        <p class="font-medium text-black">Supported format:</p>
-        <code class="block bg-gray-50 p-3 border border-[#eaeaea] font-mono text-black">Option 1, Option 2, Option 3</code>
+        <p class="font-medium text-claude-text">Supported format:</p>
+        <code class="block bg-claude-bg p-3 border border-claude-border font-mono text-claude-text">Option 1, Option 2, Option 3</code>
         <p>Values should be separated by commas.</p>
       </div>
     </AppDialog>

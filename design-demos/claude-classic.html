@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Classic</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;500;600&family=Inter:wght@400;500&display=swap');
+        
+        :root {
+            --bg: #F8F7F4;
+            --text-main: #1D1C1B;
+            --text-muted: #6B6861;
+            --accent: #D97757; /* Claude clay/terracotta */
+            --border: #E8E5E1;
+            --card-bg: #FFFFFF;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-family: 'Newsreader', serif;
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            font-family: 'Newsreader', serif;
+            font-size: 48px;
+            font-weight: 500;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -0.02em;
+        }
+        
+        p.subtitle {
+            font-size: 18px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+            max-width: 500px;
+            margin-inline: auto;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        button.primary {
+            background-color: var(--text-main);
+            color: var(--bg);
+            border: none;
+        }
+        
+        button.primary:hover {
+            background-color: #000;
+        }
+        
+        button.secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+        
+        button.secondary:hover {
+            background-color: var(--card-bg);
+        }
+        
+        .poll-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-top: 60px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.02);
+        }
+        
+        .poll-title {
+            font-family: 'Newsreader', serif;
+            font-size: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background-color: #FDF9F7;
+            z-index: 0;
+        }
+        
+        .option-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .option:first-child .option-bg {
+            width: 60%;
+            background-color: #F4E8E4; /* Soft clay accent */
+        }
+        
+        .option:last-child .option-bg {
+            width: 40%;
+        }
+        
+        .option-label {
+            font-weight: 500;
+        }
+        
+        .option-votes {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">VotingApp.</div>
+            <h1>Collect votes.<br>Without the noise.</h1>
+            <p class="subtitle">A minimalist polling platform for teams. Create a poll in seconds, see results in real-time.</p>
+            <div class="actions">
+                <button class="primary">Start Polling</button>
+                <button class="secondary">Log In</button>
+            </div>
+        </header>
+        
+        <div class="poll-card">
+            <div class="poll-title">Where should we host the offsite?</div>
+            
+            <div class="option">
+                <div class="option-bg"></div>
+                <div class="option-content">
+                    <span class="option-label">Berlin</span>
+                    <span class="option-votes">18 votes</span>
+                </div>
+            </div>
+            
+            <div class="option">
+                <div class="option-bg"></div>
+                <div class="option-content">
+                    <span class="option-label">Tokyo</span>
+                    <span class="option-votes">12 votes</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

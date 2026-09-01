@@ -28,9 +28,9 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50">
+  <div class="min-h-screen flex items-center justify-center p-4 bg-claude-bg">
     <AppCard class="w-full max-w-md p-10">
-      <h1 class="text-2xl font-medium mb-8 text-center tracking-tight text-black">Create Account</h1>
+      <h1 class="text-3xl font-serif font-normal mb-8 text-center tracking-tight text-claude-text">Create Account</h1>
 
       <form @submit.prevent="handleRegister" class="space-y-6">
         <AppInput
@@ -72,9 +72,9 @@ const handleRegister = async () => {
       </form>
 
       <div class="mt-6 text-center text-sm">
-        <p class="text-gray-500">
+        <p class="text-claude-muted">
           Already have an account?
-          <NuxtLink to="/login" class="font-medium text-black hover:underline"> Login </NuxtLink>
+          <NuxtLink to="/login" class="font-medium text-claude-text hover:underline"> Login </NuxtLink>
         </p>
       </div>
     </AppCard>

@@ -52,9 +52,9 @@ const goToCreate = async () => {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-4xl pt-24 px-6 pb-20">
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-swiss-border pb-6">
-      <h1 class="text-2xl font-medium tracking-tight text-swiss-black">My Joined Polls</h1>
+  <div class="container mx-auto max-w-5xl pt-20 px-6 pb-20">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-claude-border pb-8">
+      <h1 class="text-3xl font-serif font-normal tracking-tight text-claude-text">My Joined Polls</h1>
       <AppButton variant="primary" @click="goToCreate" :loading="isCreating" class="mt-4 md:mt-0"> Create New Poll </AppButton>
     </header>
 
@@ -65,9 +65,9 @@ const goToCreate = async () => {
 
     <!-- Empty State -->
     <div v-else-if="joinedPolls.length === 0">
-      <div class="text-center py-24 border border-dashed border-swiss-border rounded-none">
-        <h2 class="text-lg font-medium mb-2 text-swiss-black">No polls joined yet</h2>
-        <p class="text-swiss-muted mb-8 max-w-md mx-auto text-sm">
+      <div class="text-center py-24 border border-dashed border-claude-border rounded-2xl bg-claude-card/50">
+        <h2 class="text-xl font-serif mb-3 text-claude-text">No polls joined yet</h2>
+        <p class="text-claude-muted mb-8 max-w-md mx-auto text-sm leading-relaxed">
           You haven't participated in any polls yet. Why not create one or join existing ones?
         </p>
         <AppButton variant="secondary" @click="goToCreate" :loading="isCreating"> Create Your First Poll </AppButton>
@@ -75,25 +75,25 @@ const goToCreate = async () => {
     </div>
 
     <!-- Polls Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-swiss-border border border-swiss-border">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
         v-for="(poll, index) in joinedPolls"
         :key="poll.id"
-        class="bg-swiss-card hover:bg-swiss-hover transition-all duration-200 hover:-translate-y-1 hover:shadow-sm hover:z-10 cursor-pointer p-8 flex flex-col relative group"
+        class="bg-claude-card border border-claude-border rounded-2xl hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.04)] transition-all duration-300 cursor-pointer p-8 flex flex-col relative group"
         @click="goToPoll(poll.id)"
       >
-        <div class="flex justify-between items-start mb-12">
-          <h3 class="text-base font-normal line-clamp-3 leading-relaxed text-swiss-black">
+        <div class="flex justify-between items-start mb-8">
+          <h3 class="text-lg font-serif font-normal line-clamp-3 leading-relaxed text-claude-text">
             {{ poll.question }}
           </h3>
           <!-- Active Poll Indicator using an accent color -->
-          <div class="w-2 h-2 rounded-full bg-swiss-green mt-1.5 flex-shrink-0" title="Active"></div>
+          <div class="w-2.5 h-2.5 rounded-full bg-claude-accent mt-1.5 flex-shrink-0" title="Active"></div>
         </div>
 
-        <div class="mt-auto flex justify-between items-center text-xs font-mono text-swiss-muted">
-          <span>{{ poll.options.length < 10 ? '0' + poll.options.length : poll.options.length }} OPT</span>
-          <span class="text-swiss-black">
-            {{ poll.options.reduce((acc, curr) => acc + curr.votes, 0) }} VOTES
+        <div class="mt-auto flex justify-between items-center text-sm text-claude-muted">
+          <span>{{ poll.options.length }} options</span>
+          <span class="font-medium text-claude-text">
+            {{ poll.options.reduce((acc, curr) => acc + curr.votes, 0) }} votes
           </span>
         </div>
       </div>

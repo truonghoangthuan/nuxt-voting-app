@@ -34,7 +34,7 @@ const handleInput = (event: Event) => {
 
 <template>
   <div class="flex flex-col gap-1.5">
-    <label v-if="label" :for="id" class="font-medium text-sm text-black cursor-pointer">{{ label }}</label>
+    <label v-if="label" :for="id" class="font-medium text-sm text-claude-text cursor-pointer">{{ label }}</label>
     <input
       :id="id"
       :type="type"
@@ -44,7 +44,7 @@ const handleInput = (event: Event) => {
       :required="required"
       @input="handleInput"
       :placeholder="placeholder"
-      class="w-full bg-white border border-[#eaeaea] px-3 py-2 text-sm text-black placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors duration-200 rounded-none"
+      class="w-full bg-claude-card border border-claude-border px-3 py-2 text-sm text-claude-text placeholder:text-claude-muted focus:outline-none focus:border-claude-text focus:ring-1 focus:ring-claude-text transition-colors duration-200 rounded-lg"
     />
   </div>
 </template>

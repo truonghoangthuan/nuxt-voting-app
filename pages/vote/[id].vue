@@ -183,20 +183,20 @@ const getPercentage = (votes: number) => {
 
     <div v-if="!poll" class="text-center">
       <AppCard title="404">
-        <p class="text-lg text-gray-500 mb-6">Poll not found</p>
+        <p class="text-lg text-claude-muted mb-6">Poll not found</p>
         <AppButton @click="router.push('/')">Go Home</AppButton>
       </AppCard>
     </div>
 
     <AppCard v-else :title="isPollClosed ? 'Results (Closed)' : (isMaxVotesReached ? 'Results' : 'Vote Now')" show-share>
       <div class="flex justify-between items-start mb-8 gap-4">
-        <h2 class="text-2xl font-bold leading-relaxed tracking-tight text-black">{{ poll.question }}</h2>
+        <h2 class="text-2xl font-bold leading-relaxed tracking-tight text-claude-text">{{ poll.question }}</h2>
         <AppButton v-if="isCreator && !isPollClosed" variant="danger" size="sm" @click="handleClosePoll" :loading="isClosing">Close Poll</AppButton>
       </div>
 
       <div
         v-if="maxVotes > 1 && !isPollClosed"
-        class="mb-8 bg-swiss-yellow border border-[#eaeaea] p-4 text-black font-medium text-sm flex items-center gap-2"
+        class="mb-8 bg-claude-bg border border-claude-border p-4 text-claude-text font-medium text-sm flex items-center gap-2 rounded-lg"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         You have {{ remainingVotes }} votes remaining (Total: {{ maxVotes }})
@@ -209,12 +209,12 @@ const getPercentage = (votes: number) => {
           :key="option.id"
           @click="toggleOption(option.id)"
           :disabled="isOptionVoted(option.id)"
-          class="relative w-full p-4 border text-left font-medium text-lg transition-colors duration-200 group flex items-center gap-4"
+          class="relative w-full p-4 border text-left font-medium text-lg transition-colors duration-200 group flex items-center gap-4 rounded-xl mb-3"
           :class="[
             selectedOptions.includes(option.id)
-              ? 'border-black bg-gray-50'
-              : 'border-[#eaeaea] bg-white hover:bg-gray-50',
-            isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-gray-100 hover:bg-gray-100' : '',
+              ? 'border-claude-text bg-claude-bg'
+              : 'border-claude-border bg-claude-card hover:bg-claude-bg',
+            isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-claude-hover hover:bg-claude-hover' : '',
           ]"
         >
           <!-- Radio / Checkbox Indicator -->
@@ -222,23 +222,23 @@ const getPercentage = (votes: number) => {
             class="w-5 h-5 flex-shrink-0 border flex items-center justify-center transition-colors"
             :class="[
               maxVotes > 1 ? 'rounded-sm' : 'rounded-full',
-              selectedOptions.includes(option.id) ? 'border-black bg-black' : 'border-gray-300'
+              selectedOptions.includes(option.id) ? 'border-claude-text bg-claude-text' : 'border-gray-300'
             ]"
           >
-            <svg v-if="selectedOptions.includes(option.id)" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg v-if="selectedOptions.includes(option.id)" class="w-3 h-3 text-claude-bg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
             </svg>
           </div>
           
-          <div class="flex-grow flex justify-between items-center text-black">
+          <div class="flex-grow flex justify-between items-center text-claude-text">
             <span>{{ option.text }}</span>
-            <span v-if="isOptionVoted(option.id)" class="text-xs bg-gray-100 px-2 py-1 border border-gray-200 text-gray-500 font-mono tracking-wider">VOTED</span>
+            <span v-if="isOptionVoted(option.id)" class="text-xs bg-claude-hover px-2 py-1 border border-claude-border text-claude-muted font-mono tracking-wider">VOTED</span>
           </div>
         </button>
 
-        <div class="mt-8 flex justify-between items-center gap-4 border-t border-[#eaeaea] pt-8">
+        <div class="mt-8 flex justify-between items-center gap-4 border-t border-claude-border pt-8">
           <div v-if="!showAddOption">
-            <button @click="showAddOption = true" class="text-black font-medium underline hover:text-gray-600 transition-colors">
+            <button @click="showAddOption = true" class="text-claude-text font-medium underline hover:text-gray-600 transition-colors">
               + Add an Option
             </button>
           </div>
@@ -264,26 +264,26 @@ const getPercentage = (votes: number) => {
         <div
           v-for="(option, index) in poll.options"
           :key="option.id"
-          class="relative w-full border border-gray-200 bg-white cursor-pointer transition-colors hover:bg-gray-50 overflow-hidden"
+          class="relative w-full border border-claude-border bg-claude-card cursor-pointer transition-colors hover:bg-claude-bg overflow-hidden rounded-xl mb-3"
           @click="expandedOptionId = expandedOptionId === option.id ? null : option.id"
         >
           <div class="p-5 relative z-10">
             <!-- Progress Bar Background -->
             <div
-              class="absolute top-0 left-0 bottom-0 bg-gray-100 transition-all duration-1000 ease-out"
+              class="absolute top-0 left-0 bottom-0 bg-claude-hover transition-all duration-1000 ease-out"
               :style="{ width: `${getPercentage(option.votes)}%` }"
             ></div>
             
             <div class="relative z-10 flex flex-col sm:flex-row justify-between gap-2 sm:items-center">
-              <span class="font-medium text-lg text-black">{{ option.text }}</span>
+              <span class="font-medium text-lg text-claude-text">{{ option.text }}</span>
               <div class="flex items-center gap-4 text-sm font-mono">
-                <span class="text-black">{{ getPercentage(option.votes) }}% ({{ option.votes }})</span>
+                <span class="text-claude-text">{{ getPercentage(option.votes) }}% ({{ option.votes }})</span>
                 <span
                   v-if="isOptionVoted(option.id)"
-                  class="text-xs bg-black text-white px-2 py-1"
+                  class="text-xs bg-claude-text text-claude-bg px-2 py-1"
                 >YOU</span>
                 <svg
-                  class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                  class="w-4 h-4 text-claude-muted transition-transform duration-200"
                   :class="{ 'rotate-180': expandedOptionId === option.id }"
                   xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                 >
@@ -294,18 +294,18 @@ const getPercentage = (votes: number) => {
           </div>
 
           <!-- Voter List -->
-          <div v-if="expandedOptionId === option.id" class="border-t border-gray-100 bg-white p-5">
-            <p class="font-medium mb-3 text-xs uppercase tracking-wider text-gray-400 font-mono">Voters</p>
+          <div v-if="expandedOptionId === option.id" class="border-t border-claude-border bg-claude-card p-5">
+            <p class="font-medium mb-3 text-xs uppercase tracking-wider text-claude-muted font-mono">Voters</p>
             <div v-if="option.voters && option.voters.length > 0" class="flex flex-wrap gap-2">
               <span
                 v-for="voter in option.voters"
                 :key="voter"
-                class="px-2.5 py-1 bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700"
+                class="px-2.5 py-1 bg-claude-bg border border-claude-border text-sm font-medium text-gray-700"
               >
                 {{ voter }}
               </span>
             </div>
-            <p v-else class="text-gray-400 text-sm">No voters yet.</p>
+            <p v-else class="text-claude-muted text-sm">No voters yet.</p>
           </div>
         </div>
 

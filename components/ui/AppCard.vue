@@ -18,15 +18,15 @@ const handleShare = () => {
 </script>
 
 <template>
-  <div class="bg-white border border-[#eaeaea] p-8 rounded-none">
-    <div v-if="title" class="flex justify-between items-center mb-6 border-b border-[#eaeaea] pb-4">
-      <h2 class="text-xl font-medium tracking-tight flex-grow">
+  <div class="bg-claude-card border border-claude-border p-8 rounded-2xl shadow-sm">
+    <div v-if="title" class="flex justify-between items-center mb-6 border-b border-claude-border pb-4">
+      <h2 class="text-xl font-medium tracking-tight flex-grow text-claude-text">
         {{ title }}
       </h2>
       <button
         v-if="showShare"
         @click="handleShare"
-        class="flex items-center gap-2 px-3 py-1.5 font-medium text-xs bg-swiss-cyan text-black border border-[#eaeaea] hover:bg-cyan-300 transition-colors duration-200 rounded-none"
+        class="flex items-center gap-2 px-3 py-1.5 font-medium text-xs bg-claude-bg text-claude-text border border-claude-border hover:bg-claude-hover transition-colors duration-200 rounded-lg"
       >
         <span v-if="!copied">Share</span>
         <span v-else>Copied</span>

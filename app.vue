@@ -7,7 +7,7 @@ useHead({
   link: [
     {
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap'
+      href: 'https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;500;600&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap'
     }
   ]
 })
@@ -26,7 +26,7 @@ watch(user, (newUser) => {
 </script>
 
 <template>
-  <div class="min-h-screen font-sans bg-white text-black antialiased selection:bg-gray-200 selection:text-black">
+  <div class="min-h-screen font-sans bg-claude-bg text-claude-text antialiased selection:bg-claude-accent selection:text-white">
     <!-- User Name Dialog -->
     <UserNameDialog />
     
