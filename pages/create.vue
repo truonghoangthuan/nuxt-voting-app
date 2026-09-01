@@ -85,30 +85,6 @@ watch(maxVotes, () => {
       <div class="flex flex-col gap-8">
         <AppInput v-model="question" label="Question" placeholder="What do you want to ask?" />
 
-        <div class="flex flex-col gap-1.5">
-          <label class="font-medium text-sm text-claude-text">Max Votes per User</label>
-          <AppInput
-            v-model="maxVotes"
-            type="number"
-            min="1"
-            :max="options.length"
-            placeholder="1"
-            class="w-32"
-            @keydown="(e: KeyboardEvent) => ['-', 'e', '+'].includes(e.key) && e.preventDefault()"
-          />
-        </div>
-
-        <div class="flex flex-col gap-1.5">
-          <label class="font-medium text-sm text-claude-text">Deadline (in hours from now) - Optional</label>
-          <AppInput
-            v-model="deadlineHours"
-            type="number"
-            min="1"
-            placeholder="e.g. 24"
-            class="w-32"
-          />
-        </div>
-
         <div class="flex flex-col gap-4">
           <label class="font-medium text-sm text-claude-text">Options</label>
           <div
@@ -159,6 +135,30 @@ watch(maxVotes, () => {
               ?
             </button>
           </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-medium text-sm text-claude-text">Max Votes per User</label>
+          <AppInput
+            v-model="maxVotes"
+            type="number"
+            min="1"
+            :max="options.length"
+            placeholder="1"
+            class="w-32"
+            @keydown="(e: KeyboardEvent) => ['-', 'e', '+'].includes(e.key) && e.preventDefault()"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-medium text-sm text-claude-text">Deadline (in hours from now) - Optional</label>
+          <AppInput
+            v-model="deadlineHours"
+            type="number"
+            min="1"
+            placeholder="e.g. 24"
+            class="w-32"
+          />
         </div>
 
         <div class="border-t border-claude-border my-4"></div>
