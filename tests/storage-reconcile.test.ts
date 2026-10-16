@@ -137,3 +137,17 @@ test('buildVoteActivity: returns null when selection did not change', () => {
 
   assert.equal(activity, null);
 });
+
+test('buildVoteActivity: returns change_vote activity for guest user with voterName and no userId', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Pizza', votes: 1, voters: ['Alice'], voterIds: [] },
+    { id: 'opt2', text: 'Sushi', votes: 0, voters: [], voterIds: [] },
+  ];
+
+  const activity = buildVoteActivity(options, ['opt2'], undefined, 'Alice', 1700000004000);
+
+  assert.ok(activity);
+  assert.equal(activity.type, 'change_vote');
+  assert.deepEqual(activity.previousOptionTexts, ['Pizza']);
+  assert.deepEqual(activity.optionTexts, ['Sushi']);
+});

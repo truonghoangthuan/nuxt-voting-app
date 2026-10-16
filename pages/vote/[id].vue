@@ -36,6 +36,37 @@ if (pollRef.value) {
   poll.value = pollRef.value;
 }
 
+let isSyncingVote = false;
+let pendingOptionIds: string[] | null = null;
+let voteBaseline: { options: any; activities: any; participants: any } | null = null;
+
+const syncVote = async (targetOptionIds: string[], actorName: string, userId?: string) => {
+  isSyncingVote = true;
+  try {
+    await vote(pollId, targetOptionIds, actorName, userId);
+    if (pendingOptionIds === null) {
+      voteBaseline = null;
+    }
+  } catch (e) {
+    if (poll.value && voteBaseline) {
+      poll.value.options = voteBaseline.options;
+      poll.value.activities = voteBaseline.activities;
+      poll.value.participants = voteBaseline.participants;
+      voteBaseline = null;
+    }
+    pendingOptionIds = null;
+    const { addToast } = useToast();
+    addToast('Failed to update vote', 'error');
+  } finally {
+    isSyncingVote = false;
+    if (pendingOptionIds !== null) {
+      const nextBatch = pendingOptionIds;
+      pendingOptionIds = null;
+      await syncVote(nextBatch, actorName, userId);
+    }
+  }
+};
+
 const handleOptionClick = async (optionId: string) => {
   if (isPollClosed.value || !poll.value) return;
 
@@ -54,8 +85,14 @@ const handleOptionClick = async (optionId: string) => {
     return;
   }
 
-  const previousOptions = JSON.parse(JSON.stringify(poll.value.options));
-  const previousActivities = JSON.parse(JSON.stringify(poll.value.activities || []));
+  if (voteBaseline === null) {
+    voteBaseline = {
+      options: JSON.parse(JSON.stringify(poll.value.options)),
+      activities: JSON.parse(JSON.stringify(poll.value.activities || [])),
+      participants: JSON.parse(JSON.stringify(poll.value.participants || [])),
+    };
+  }
+
   const userId = user.value?.uid;
   const actorName = userName.value || 'Guest';
 
@@ -73,15 +110,10 @@ const handleOptionClick = async (optionId: string) => {
     }
   }
 
-  try {
-    await vote(pollId, nextOptionIds, actorName, userId);
-  } catch (e) {
-    if (poll.value) {
-      poll.value.options = previousOptions;
-      poll.value.activities = previousActivities;
-    }
-    const { addToast } = useToast();
-    addToast('Failed to update vote', 'error');
+  if (isSyncingVote) {
+    pendingOptionIds = nextOptionIds;
+  } else {
+    await syncVote(nextOptionIds, actorName, userId);
   }
 };
 
@@ -162,6 +194,9 @@ let unsubscribe: (() => void) | undefined;
 
 onMounted(() => {
   unsubscribe = subscribe(pollId, (updatedPoll) => {
+    if (isSyncingVote || pendingOptionIds !== null) {
+      return;
+    }
     poll.value = updatedPoll;
   });
 });

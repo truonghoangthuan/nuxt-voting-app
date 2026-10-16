@@ -89,7 +89,9 @@ export function buildVoteActivity(
   voterName?: string,
   now: number = Date.now()
 ): PollActivity | null {
-  const previousOptions = userId ? options.filter((o) => o.voterIds?.includes(userId)) : [];
+  const previousOptions = userId
+    ? options.filter((o) => o.voterIds?.includes(userId))
+    : (voterName ? options.filter((o) => o.voters?.includes(voterName)) : []);
   const nextOptions = options.filter((o) => uniqueOptionIds.includes(o.id));
 
   const prevIds = previousOptions.map((o) => o.id).sort();
