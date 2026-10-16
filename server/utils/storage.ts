@@ -2,7 +2,9 @@ import type { H3Event } from 'h3';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { QueryDocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { firestore } from './firebase';
-import { reconcileVotes } from './reconcile';
+import { reconcileVotes, buildVoteActivity, type PollActivity } from './reconcile';
+
+export type { PollActivity };
 
 export interface PollOption {
   id: string;
@@ -10,6 +12,8 @@ export interface PollOption {
   votes: number;
   voters: string[] | null;
   voterIds?: string[]; // IDs of users who voted for this option
+  addedBy?: string | null;
+  addedByUserId?: string | null;
 }
 
 export interface Poll {
@@ -23,6 +27,7 @@ export interface Poll {
   creatorId: string | null;
   deadline?: number | null;
   comments?: { id: string; text: string; author: string; createdAt: number }[];
+  activities?: PollActivity[];
 }
 
 // Store active SSE connections locally
@@ -66,6 +71,7 @@ export const usePollStorage = () => {
       creatorId,
       deadline,
       comments: [],
+      activities: [],
     };
 
     await firestore.collection('polls').doc(id).set(poll);
@@ -86,8 +92,8 @@ export const usePollStorage = () => {
 
         const maxVotes = poll.maxVotes || 1;
         const uniqueOptionIds = Array.from(new Set(optionIds || []));
-        if (uniqueOptionIds.length < 1 || uniqueOptionIds.length > maxVotes) {
-          throw new Error(`Must select between 1 and ${maxVotes} options`);
+        if (uniqueOptionIds.length > maxVotes) {
+          throw new Error(`Must select between 0 and ${maxVotes} options`);
         }
         for (const optionId of uniqueOptionIds) {
           if (!poll.options.some((o) => o.id === optionId)) {
@@ -95,15 +101,21 @@ export const usePollStorage = () => {
           }
         }
 
+        const activity = buildVoteActivity(poll.options, uniqueOptionIds, userId, voterName);
         const updatedOptions = reconcileVotes(poll.options, uniqueOptionIds, userId, voterName);
 
         const updateData: any = { options: updatedOptions };
 
-        // If userId is provided, add it to participants list
+        if (activity) {
+          updateData.activities = [activity, ...(poll.activities || [])].slice(0, 30);
+        }
+
+        // If userId is provided, update participants list
         if (userId) {
-          const currentParticipants = poll.participants || [];
-          if (!currentParticipants.includes(userId)) {
+          if (uniqueOptionIds.length > 0) {
             updateData.participants = FieldValue.arrayUnion(userId);
+          } else {
+            updateData.participants = FieldValue.arrayRemove(userId);
           }
         }
 
@@ -116,7 +128,7 @@ export const usePollStorage = () => {
     }
   };
 
-  const addOption = async (pollId: string, optionText: string) => {
+  const addOption = async (pollId: string, optionText: string, voterName?: string, userId?: string) => {
     const pollRef = firestore.collection('polls').doc(pollId);
     
     try {
@@ -133,10 +145,21 @@ export const usePollStorage = () => {
           votes: 0,
           voters: [],
           voterIds: [],
+          addedBy: voterName || 'Guest',
+          addedByUserId: userId || null,
         };
         
         const updatedOptions = [...poll.options, newOption];
-        t.update(pollRef, { options: updatedOptions });
+        const activity: PollActivity = {
+          id: Math.random().toString(36).substring(2, 9),
+          type: 'add_option',
+          actorName: voterName || 'Guest',
+          actorId: userId || null,
+          optionTexts: [optionText],
+          createdAt: Date.now(),
+        };
+        const updatedActivities = [activity, ...(poll.activities || [])].slice(0, 30);
+        t.update(pollRef, { options: updatedOptions, activities: updatedActivities });
       });
       return true;
     } catch (e) {
