@@ -49,6 +49,31 @@ test('reconcileVotes: keeping previously voted option does not duplicate vote', 
   assert.deepEqual(result[1].voters, ['Alice']);
 });
 
+test('reconcileVotes: deselecting option with voterName removes correct voter name even if voterIds desynced', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Option 1', votes: 2, voters: ['Bob'], voterIds: ['userWithoutName', 'userAlice'] },
+  ];
+
+  // Alice had no name in voters, but passes voterName 'Alice' now; Bob must not be deleted
+  const result = reconcileVotes(options, [], 'userAlice', 'Alice');
+
+  assert.equal(result[0].votes, 1);
+  assert.deepEqual(result[0].voterIds, ['userWithoutName']);
+  assert.deepEqual(result[0].voters, ['Bob']);
+});
+
+test('reconcileVotes: deselecting option without voterName does not delete other user name', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Option 1', votes: 2, voters: ['Bob'], voterIds: ['userWithoutName', 'userBob'] },
+  ];
+
+  const result = reconcileVotes(options, [], 'userWithoutName', undefined);
+
+  assert.equal(result[0].votes, 1);
+  assert.deepEqual(result[0].voterIds, ['userBob']);
+  assert.deepEqual(result[0].voters, ['Bob']);
+});
+
 test('reconcileVotes: fallback without userId increments votes', () => {
   const options: ReconcileOption[] = [
     { id: 'opt1', text: 'Option 1', votes: 0, voters: [], voterIds: [] },

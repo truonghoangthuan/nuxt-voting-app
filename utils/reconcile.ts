@@ -34,11 +34,11 @@ export function reconcileVotes<T extends ReconcileOption>(
 
       if (wasVoted && !shouldBeVoted) {
         voterIds.splice(existingIndex, 1);
-        if (existingIndex < voters.length) {
-          voters.splice(existingIndex, 1);
-        } else if (voterName) {
+        if (voterName) {
           const nameIdx = voters.indexOf(voterName);
-          if (nameIdx !== -1) voters.splice(nameIdx, 1);
+          if (nameIdx !== -1) {
+            voters.splice(nameIdx, 1);
+          }
         }
         return {
           ...targetOption,

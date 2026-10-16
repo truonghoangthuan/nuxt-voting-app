@@ -67,6 +67,7 @@ const cancelEditingVote = () => {
 const handleVote = async () => {
   if (selectedOptions.value.length > 0 && canVote.value) {
     const currentOptionIds = [...selectedOptions.value];
+    const previousOptions = poll.value ? JSON.parse(JSON.stringify(poll.value.options)) : [];
     const userId = user.value?.uid;
 
     // Optimistic update: reconcile local poll state immediately
@@ -83,7 +84,15 @@ const handleVote = async () => {
     isEditing.value = false;
     selectedOptions.value = [];
 
-    await vote(pollId, currentOptionIds, userName.value, userId);
+    try {
+      await vote(pollId, currentOptionIds, userName.value, userId);
+    } catch (e) {
+      if (poll.value) {
+        poll.value.options = previousOptions;
+      }
+      const { addToast } = useToast();
+      addToast('Failed to submit vote', 'error');
+    }
   }
 };
 
