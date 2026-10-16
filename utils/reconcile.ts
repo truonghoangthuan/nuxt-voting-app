@@ -4,6 +4,18 @@ export interface ReconcileOption {
   votes: number;
   voters: string[] | null;
   voterIds?: string[];
+  addedBy?: string | null;
+  addedByUserId?: string | null;
+}
+
+export interface PollActivity {
+  id: string;
+  type: 'vote' | 'change_vote' | 'unvote' | 'add_option';
+  actorName: string;
+  actorId?: string | null;
+  optionTexts: string[];
+  previousOptionTexts?: string[];
+  createdAt: number;
 }
 
 export function reconcileVotes<T extends ReconcileOption>(
@@ -68,4 +80,58 @@ export function reconcileVotes<T extends ReconcileOption>(
 
     return targetOption;
   });
+}
+
+export function buildVoteActivity(
+  options: ReconcileOption[],
+  uniqueOptionIds: string[],
+  userId?: string,
+  voterName?: string,
+  now: number = Date.now()
+): PollActivity | null {
+  const previousOptions = userId ? options.filter((o) => o.voterIds?.includes(userId)) : [];
+  const nextOptions = options.filter((o) => uniqueOptionIds.includes(o.id));
+
+  const prevIds = previousOptions.map((o) => o.id).sort();
+  const nextIds = [...uniqueOptionIds].sort();
+
+  if (prevIds.length === nextIds.length && prevIds.every((id, idx) => id === nextIds[idx])) {
+    return null;
+  }
+
+  const actorName = voterName || 'Guest';
+  const actorId = userId || null;
+
+  if (previousOptions.length === 0 && nextOptions.length > 0) {
+    return {
+      id: Math.random().toString(36).substring(2, 9),
+      type: 'vote',
+      actorName,
+      actorId,
+      optionTexts: nextOptions.map((o) => o.text || o.id),
+      createdAt: now,
+    };
+  }
+
+  if (previousOptions.length > 0 && nextOptions.length === 0) {
+    return {
+      id: Math.random().toString(36).substring(2, 9),
+      type: 'unvote',
+      actorName,
+      actorId,
+      optionTexts: previousOptions.map((o) => o.text || o.id),
+      previousOptionTexts: previousOptions.map((o) => o.text || o.id),
+      createdAt: now,
+    };
+  }
+
+  return {
+    id: Math.random().toString(36).substring(2, 9),
+    type: 'change_vote',
+    actorName,
+    actorId,
+    previousOptionTexts: previousOptions.map((o) => o.text || o.id),
+    optionTexts: nextOptions.map((o) => o.text || o.id),
+    createdAt: now,
+  };
 }

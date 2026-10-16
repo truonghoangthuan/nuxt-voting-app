@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { reconcileVotes, type ReconcileOption } from '../server/utils/reconcile.ts';
+import { reconcileVotes, buildVoteActivity, type ReconcileOption } from '../server/utils/reconcile.ts';
 
 test('reconcileVotes: adds vote when option newly selected', () => {
   const options: ReconcileOption[] = [
@@ -83,4 +83,57 @@ test('reconcileVotes: fallback without userId increments votes', () => {
 
   assert.equal(result[0].votes, 1);
   assert.deepEqual(result[0].voters, ['Bob']);
+});
+
+test('buildVoteActivity: returns vote activity when user casts first vote', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Pizza', votes: 0, voters: [], voterIds: [] },
+    { id: 'opt2', text: 'Sushi', votes: 0, voters: [], voterIds: [] },
+  ];
+
+  const activity = buildVoteActivity(options, ['opt1'], 'user1', 'Alice', 1700000000000);
+
+  assert.ok(activity);
+  assert.equal(activity.type, 'vote');
+  assert.equal(activity.actorName, 'Alice');
+  assert.equal(activity.actorId, 'user1');
+  assert.deepEqual(activity.optionTexts, ['Pizza']);
+  assert.equal(activity.createdAt, 1700000000000);
+});
+
+test('buildVoteActivity: returns change_vote activity when user switches options', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Pizza', votes: 1, voters: ['Alice'], voterIds: ['user1'] },
+    { id: 'opt2', text: 'Sushi', votes: 0, voters: [], voterIds: [] },
+  ];
+
+  const activity = buildVoteActivity(options, ['opt2'], 'user1', 'Alice', 1700000001000);
+
+  assert.ok(activity);
+  assert.equal(activity.type, 'change_vote');
+  assert.deepEqual(activity.previousOptionTexts, ['Pizza']);
+  assert.deepEqual(activity.optionTexts, ['Sushi']);
+});
+
+test('buildVoteActivity: returns unvote activity when user clears all selected options', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Pizza', votes: 1, voters: ['Alice'], voterIds: ['user1'] },
+  ];
+
+  const activity = buildVoteActivity(options, [], 'user1', 'Alice', 1700000002000);
+
+  assert.ok(activity);
+  assert.equal(activity.type, 'unvote');
+  assert.deepEqual(activity.previousOptionTexts, ['Pizza']);
+  assert.deepEqual(activity.optionTexts, ['Pizza']);
+});
+
+test('buildVoteActivity: returns null when selection did not change', () => {
+  const options: ReconcileOption[] = [
+    { id: 'opt1', text: 'Pizza', votes: 1, voters: ['Alice'], voterIds: ['user1'] },
+  ];
+
+  const activity = buildVoteActivity(options, ['opt1'], 'user1', 'Alice', 1700000003000);
+
+  assert.equal(activity, null);
 });
