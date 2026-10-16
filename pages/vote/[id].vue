@@ -8,13 +8,13 @@ import { useUserVotes } from '~/composables/useUserVotes';
 const route = useRoute();
 const router = useRouter();
 const { getPoll, vote, subscribe } = usePolls();
-const { getVoteCount, hasVotedForOption } = useUserVotes();
+const { hasVotedForOption, getVotedOptions } = useUserVotes();
 const { userName } = useUser();
 const pollId = route.params.id as string;
 
 const poll = ref<Poll | null>(null);
 const selectedOptions = ref<string[]>([]);
-const userVoteCount = ref(0);
+const isEditing = ref(false);
 const expandedOptionId = ref<string | null>(null);
 
 const { user } = useAuth();
@@ -29,68 +29,61 @@ const isPollClosed = computed(() => {
 });
 
 const maxVotes = computed(() => poll.value?.maxVotes || 1);
-const remainingVotes = computed(() => maxVotes.value - userVoteCount.value);
+const userVotedOptions = computed(() => (poll.value ? getVotedOptions(poll.value) : []));
+const hasSubmittedVote = computed(() => userVotedOptions.value.length > 0);
+const showVotingForm = computed(() => !isPollClosed.value && (!hasSubmittedVote.value || isEditing.value));
+const remainingVotes = computed(() => Math.max(0, maxVotes.value - selectedOptions.value.length));
 const canVote = computed(() => {
-  return !isPollClosed.value && selectedOptions.value.length > 0 && selectedOptions.value.length <= remainingVotes.value;
+  return !isPollClosed.value && selectedOptions.value.length >= 1 && selectedOptions.value.length <= maxVotes.value;
 });
-const isMaxVotesReached = computed(() => userVoteCount.value >= maxVotes.value);
 
 const pollRef = await getPoll(pollId);
 if (pollRef.value) {
   poll.value = pollRef.value;
-  if (poll.value) {
-    userVoteCount.value = getVoteCount(poll.value);
-  }
 }
 
 const toggleOption = (optionId: string) => {
-  if (isOptionVoted(optionId)) return;
+  if (isPollClosed.value) return;
 
   if (selectedOptions.value.includes(optionId)) {
     selectedOptions.value = selectedOptions.value.filter((id) => id !== optionId);
-  } else {
-    if (selectedOptions.value.length < remainingVotes.value) {
-      selectedOptions.value.push(optionId);
-    }
+  } else if (maxVotes.value === 1) {
+    selectedOptions.value = [optionId];
+  } else if (selectedOptions.value.length < maxVotes.value) {
+    selectedOptions.value.push(optionId);
   }
+};
+
+const startEditingVote = () => {
+  selectedOptions.value = [...userVotedOptions.value];
+  isEditing.value = true;
+};
+
+const cancelEditingVote = () => {
+  selectedOptions.value = [];
+  isEditing.value = false;
 };
 
 const handleVote = async () => {
   if (selectedOptions.value.length > 0 && canVote.value) {
     const currentOptionIds = [...selectedOptions.value];
-
-    // Optimistic update: Update local poll state immediately
     const userId = user.value?.uid;
-    if (poll.value && userId) {
-      currentOptionIds.forEach((optionId) => {
-        const option = poll.value!.options.find((o) => o.id === optionId);
-        if (option) {
-          option.votes = (option.votes || 0) + 1;
-          if (!option.voterIds) option.voterIds = [];
-          option.voterIds.push(userId);
 
-          // Also add to voters list for display if needed
-          if (userName.value) {
-            if (!option.voters) option.voters = [];
-            option.voters.push(userName.value);
-          }
+    // Optimistic update: reconcile local poll state immediately
+    if (poll.value) {
+      poll.value.options = reconcileVotes(poll.value.options, currentOptionIds, userId, userName.value || undefined);
+      if (userId) {
+        if (!poll.value.participants) poll.value.participants = [];
+        if (!poll.value.participants.includes(userId)) {
+          poll.value.participants.push(userId);
         }
-      });
-
-      // Update participants list
-      if (!poll.value.participants) poll.value.participants = [];
-      if (!poll.value.participants.includes(userId)) {
-        poll.value.participants.push(userId);
       }
     }
 
-    // Update simple counter
-    userVoteCount.value += currentOptionIds.length;
+    isEditing.value = false;
+    selectedOptions.value = [];
 
     await vote(pollId, currentOptionIds, userName.value, userId);
-
-    // Reset selection
-    selectedOptions.value = [];
   }
 };
 
@@ -150,11 +143,6 @@ onMounted(() => {
   // Subscribe to real-time updates
   unsubscribe = subscribe(pollId, (updatedPoll) => {
     poll.value = updatedPoll;
-    // Update local user vote count from fresh data if needed, or rely on local state
-    if (poll.value) {
-      // We might want to re-calc userVoteCount here to be safe, but useUserVotes depends on poll value
-      userVoteCount.value = getVoteCount(poll.value);
-    }
   });
 });
 
@@ -188,33 +176,31 @@ const getPercentage = (votes: number) => {
       </AppCard>
     </div>
 
-    <AppCard v-else :title="isPollClosed ? 'Results (Closed)' : (isMaxVotesReached ? 'Results' : 'Vote Now')" show-share>
+    <AppCard v-else :title="isPollClosed ? 'Results (Closed)' : (showVotingForm ? (isEditing ? 'Edit Your Vote' : 'Vote Now') : 'Results')" show-share>
       <div class="flex justify-between items-start mb-8 gap-4">
         <h2 class="text-2xl font-bold leading-relaxed tracking-tight text-claude-text">{{ poll.question }}</h2>
         <AppButton v-if="isCreator && !isPollClosed" variant="danger" size="sm" @click="handleClosePoll" :loading="isClosing">Close Poll</AppButton>
       </div>
 
       <div
-        v-if="maxVotes > 1 && !isPollClosed"
+        v-if="maxVotes > 1 && showVotingForm"
         class="mb-8 bg-claude-bg border border-claude-border p-4 text-claude-text font-medium text-sm flex items-center gap-2 rounded-lg"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        You have {{ remainingVotes }} votes remaining (Total: {{ maxVotes }})
+        You can select up to {{ maxVotes }} options ({{ remainingVotes }} remaining)
       </div>
-      <div v-else class="mb-8"></div>
+      <div v-else-if="showVotingForm" class="mb-8"></div>
 
-      <div v-if="!isMaxVotesReached && !isPollClosed" class="flex flex-col gap-3">
+      <div v-if="showVotingForm" class="flex flex-col gap-3">
         <button
           v-for="(option, index) in poll.options"
           :key="option.id"
           @click="toggleOption(option.id)"
-          :disabled="isOptionVoted(option.id)"
-          class="relative w-full p-4 border text-left font-medium text-lg transition-colors duration-200 group flex items-center gap-4 rounded-xl mb-3"
+          class="relative w-full p-4 border text-left font-medium text-lg transition-colors duration-200 group flex items-center gap-4 rounded-xl mb-3 cursor-pointer"
           :class="[
             selectedOptions.includes(option.id)
               ? 'border-claude-text bg-claude-bg'
               : 'border-claude-border bg-claude-card hover:bg-claude-bg',
-            isOptionVoted(option.id) ? 'opacity-50 cursor-not-allowed bg-claude-hover hover:bg-claude-hover' : '',
           ]"
         >
           <!-- Radio / Checkbox Indicator -->
@@ -248,15 +234,20 @@ const getPercentage = (votes: number) => {
             <AppButton variant="secondary" @click="showAddOption = false">Cancel</AppButton>
           </div>
 
-          <AppButton
-            v-if="selectedOptions.length > 0"
-            variant="black"
-            @click="handleVote"
-            class="text-base px-8 ml-auto"
-            :disabled="!canVote"
-          >
-            Submit Vote ({{ selectedOptions.length }})
-          </AppButton>
+          <div class="flex items-center gap-3 ml-auto">
+            <AppButton v-if="isEditing" variant="secondary" @click="cancelEditingVote">
+              Cancel
+            </AppButton>
+            <AppButton
+              v-if="selectedOptions.length > 0"
+              variant="black"
+              @click="handleVote"
+              class="text-base px-8"
+              :disabled="!canVote"
+            >
+              {{ isEditing ? 'Update Vote' : 'Submit Vote' }} ({{ selectedOptions.length }})
+            </AppButton>
+          </div>
         </div>
       </div>
 
@@ -309,7 +300,14 @@ const getPercentage = (votes: number) => {
           </div>
         </div>
 
-        <AppButton block variant="secondary" @click="router.push('/')" class="mt-8"> Create Another Poll </AppButton>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          <AppButton v-if="!isPollClosed" block variant="primary" @click="startEditingVote">
+            Edit Vote
+          </AppButton>
+          <AppButton block variant="secondary" @click="router.push('/')">
+            Create Another Poll
+          </AppButton>
+        </div>
       </div>
     </AppCard>
   </div>
