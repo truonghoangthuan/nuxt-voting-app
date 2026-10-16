@@ -2,6 +2,7 @@ import type { H3Event } from 'h3';
 import { FieldValue } from 'firebase-admin/firestore';
 import type { QueryDocumentSnapshot, Transaction } from 'firebase-admin/firestore';
 import { firestore } from './firebase';
+import { reconcileVotes } from './reconcile';
 
 export interface PollOption {
   id: string;
@@ -80,59 +81,26 @@ export const usePollStorage = () => {
         if (!doc.exists) throw new Error('Poll not found');
 
         const poll = doc.data() as Poll;
+        if (poll.status === 'closed') throw new Error('Poll is closed');
+        if (poll.deadline && Date.now() > poll.deadline) throw new Error('Poll deadline has passed');
+
         const maxVotes = poll.maxVotes || 1;
-
-        // Create a deep copy of the options array to modify
-        const updatedOptions: PollOption[] = [...poll.options];
-
-        // Validate and update each selected option
-        for (const optionId of optionIds) {
-          const optionIndex = updatedOptions.findIndex((o) => o.id === optionId);
-          if (optionIndex === -1) throw new Error(`Option ${optionId} not found`);
-
-          const targetOption = updatedOptions[optionIndex];
-          if (!targetOption) throw new Error('Option structure invalid');
-
-          const updatedOption: PollOption = {
-            ...targetOption,
-            voters: targetOption.voters ? [...targetOption.voters] : [],
-            voterIds: targetOption.voterIds ? [...targetOption.voterIds] : [],
-          };
-
-          // Check if user already voted for this SPECIFIC option
-          if (userId && updatedOption.voterIds?.includes(userId)) {
-            throw new Error('Already voted for this option');
-          }
-
-          updatedOption.votes += 1;
-
-          if (voterName) {
-            updatedOption.voters = updatedOption.voters ? [...updatedOption.voters, voterName] : [voterName];
-          }
-
-          if (userId) {
-            updatedOption.voterIds!.push(userId);
-          }
-
-          updatedOptions[optionIndex] = updatedOption;
+        const uniqueOptionIds = Array.from(new Set(optionIds || []));
+        if (uniqueOptionIds.length < 1 || uniqueOptionIds.length > maxVotes) {
+          throw new Error(`Must select between 1 and ${maxVotes} options`);
         }
+        for (const optionId of uniqueOptionIds) {
+          if (!poll.options.some((o) => o.id === optionId)) {
+            throw new Error(`Option ${optionId} not found`);
+          }
+        }
+
+        const updatedOptions = reconcileVotes(poll.options, uniqueOptionIds, userId, voterName);
 
         const updateData: any = { options: updatedOptions };
 
-        // If userId is provided, add it to participants list and check maxVotes logic across ALL options
+        // If userId is provided, add it to participants list
         if (userId) {
-          let userTotalVotes = 0;
-
-          updatedOptions.forEach((opt) => {
-            if (opt.voterIds?.includes(userId)) {
-              userTotalVotes++;
-            }
-          });
-
-          if (userTotalVotes > maxVotes) {
-            throw new Error(`Max votes (${maxVotes}) reached. You have ${userTotalVotes} votes.`);
-          }
-
           const currentParticipants = poll.participants || [];
           if (!currentParticipants.includes(userId)) {
             updateData.participants = FieldValue.arrayUnion(userId);
